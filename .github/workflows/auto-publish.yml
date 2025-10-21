@@ -1,5 +1,5 @@
-na# Auto-publish workflow for Bernova - CSS-in-JS styling framework
-# 
+# Auto-publish workflow for Bernova - CSS-in-JS styling framework
+#
 # Bernova is a CSS generation framework that allows writing CSS with JavaScript syntax
 # This workflow automatically publishes new versions to NPM when PRs are merged
 #
@@ -112,7 +112,7 @@ jobs:
           BIN_BERNOVA=$(node -p "require('./package.json').bin.bernova")
           BIN_CONFIG=$(node -p "require('./package.json').bin['bv-config']")
           BIN_BUILD=$(node -p "require('./package.json').bin['bv-build']")
-          
+
           for bin_file in "$BIN_BERNOVA" "$BIN_CONFIG" "$BIN_BUILD"; do
             if [ ! -f "$bin_file" ]; then
               echo "Binary file $bin_file does not exist after build"
