@@ -1,0 +1,8 @@
+node_modules/
+styles/
+fixture/
+bernova.config.json
+**.tgz
+coverage/
+__reports__
+yarn.lock

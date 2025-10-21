@@ -1,0 +1,130 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: '[Feature]: '
+labels: ['enhancement', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature for Bernova! 💡
+
+        Bernova is a CSS-in-JS framework that helps you write CSS with JavaScript syntax.
+        We appreciate your ideas to make it even better!
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem Description
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when generating CSS for [specific use case] or when using Bernova CLI for [specific task]...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like
+      placeholder: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe alternatives you've considered
+      placeholder: A clear and concise description of any alternative solutions or features you've considered.
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe your use case
+      placeholder: Explain how this feature would be used in CSS generation, theming, CLI usage, or build process. Why is it important for Bernova users?
+    validations:
+      required: true
+
+  - type: textarea
+    id: example-usage
+    attributes:
+      label: Example Usage
+      description: Show how the feature would work in Bernova configuration or API
+      render: javascript
+      placeholder: |
+        // bernova.config.json
+        {
+          "newFeature": {
+            "enabled": true,
+            "options": {
+              // example configuration
+            }
+          }
+        }
+
+        // OR API usage
+        const { generateCSS } = require('bernova');
+
+        const styles = generateCSS({
+          newFeature: {
+            // example usage
+          }
+        });
+
+  - type: checkboxes
+    id: feature-type
+    attributes:
+      label: Feature Type
+      options:
+        - label: New CSS generation feature
+        - label: New CLI command or option
+        - label: Configuration enhancement
+        - label: Theme system improvement
+        - label: Build process optimization
+        - label: Performance improvement
+        - label: Developer experience improvement
+        - label: Documentation improvement
+        - label: New CSS property support
+        - label: Media query enhancement
+        - label: Plugin system feature
+        - label: Other
+
+  - type: textarea
+    id: expected-output
+    attributes:
+      label: Expected CSS Output
+      description: If applicable, show what CSS output you would expect from this feature
+      render: css
+      placeholder: |
+        /* Expected generated CSS */
+        .example-class {
+          property: value;
+        }
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to your workflow?
+      options:
+        - 'Nice to have'
+        - 'Would improve workflow'
+        - 'Important for my project'
+        - 'Critical/blocking'
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: implementation-help
+    attributes:
+      label: Implementation
+      options:
+        - label: I would be willing to help implement this feature
+        - label: I would be willing to write tests for this feature
+        - label: I would be willing to write documentation for this feature
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, links to similar features in other tools, or screenshots about the feature request here.
