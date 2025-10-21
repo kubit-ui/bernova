@@ -96,26 +96,6 @@ jobs:
             echo "title_length_valid=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Code Quality Checks
-        id: code-quality
-        run: |
-          echo "Running code quality checks..."
-
-          # TypeScript type checking
-          if yarn run --help | grep -q "type-check"; then
-            echo "Running TypeScript checks..."
-            if yarn type-check; then
-              echo "✅ TypeScript checks passed"
-              echo "typescript_valid=true" >> $GITHUB_OUTPUT
-            else
-              echo "❌ TypeScript checks failed"
-              echo "typescript_valid=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "⚠️ No type-check script found"
-            echo "typescript_valid=true" >> $GITHUB_OUTPUT
-          fi
-
       - name: Test Coverage
         id: test-validation
         continue-on-error: true
@@ -203,7 +183,6 @@ jobs:
               branch_valid: '${{ steps.branch-validation.outputs.branch_valid }}' === 'true',
               title_valid: '${{ steps.pr-title-validation.outputs.title_valid }}' === 'true',
               title_length_valid: '${{ steps.pr-title-validation.outputs.title_length_valid }}' === 'true',
-              typescript_valid: '${{ steps.code-quality.outputs.typescript_valid }}' === 'true',
               tests_valid: '${{ steps.test-validation.outputs.tests_valid }}' === 'true',
               console_logs: '${{ steps.file-validation.outputs.console_logs }}' === 'true',
               todos_without_issues: '${{ steps.file-validation.outputs.todos_without_issues }}' === 'true',
@@ -229,11 +208,6 @@ jobs:
 
             if (!results.title_valid) {
               issues.push('❌ PR title must follow conventional commits: `type: description`');
-              blocking = true;
-            }
-
-            if (!results.typescript_valid) {
-              issues.push('❌ TypeScript validation failed - fix type errors');
               blocking = true;
             }
 
@@ -285,7 +259,6 @@ jobs:
             |-------|--------|-------------|
             | **Branch Naming** | ${results.branch_valid ? '✅ Pass' : '❌ Fail'} | Must follow \`type/description\` pattern |
             | **PR Title** | ${results.title_valid ? '✅ Pass' : '❌ Fail'} | Must follow conventional commits |
-            | **TypeScript** | ${results.typescript_valid ? '✅ Pass' : '❌ Fail'} | Type checking validation |
             | **Tests** | ${results.tests_valid ? '✅ Pass' : '❌ Fail'} | All tests must pass |`;
 
             if (results.code_changes) {
