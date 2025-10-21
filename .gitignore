@@ -6,3 +6,4 @@ bernova.config.json
 coverage/
 __reports__
 yarn.lock
+dist
