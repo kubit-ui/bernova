@@ -1,0 +1,135 @@
+name: Bug Report
+description: File a bug report to help us improve
+title: '[Bug]: '
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report for Bernova! 🐛
+
+        Bernova is a CSS-in-JS framework that helps you write CSS with JavaScript syntax.
+        Please provide as much detail as possible to help us identify and fix the issue.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Install bernova via 'npm install bernova'
+        2. Create configuration file with 'npx bv-config'
+        3. Run 'npx bernova' or specific command
+        4. See error message or unexpected output
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Bernova Configuration
+      description: Please paste your Bernova configuration file (bernova.config.json or similar)
+      render: json
+      placeholder: |
+        {
+          "themes": {
+            "default": {
+              "colors": {
+                "primary": "#007bff"
+              }
+            }
+          },
+          "breakpoints": {
+            "sm": "640px",
+            "md": "768px"
+          }
+        }
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Bernova Version
+      placeholder: '0.0.1'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: command-used
+    attributes:
+      label: Command Used
+      description: Which Bernova command were you using when the issue occurred?
+      options:
+        - 'bernova (main CLI)'
+        - 'bv-config (configuration)'
+        - 'bv-build (build styles)'
+        - 'npm/yarn scripts'
+        - 'programmatic API'
+        - 'Other'
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js Version
+      placeholder: '18.17.0'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error Output
+      description: If you received an error message, please paste it here
+      render: shell
+      placeholder: |
+        Error: Failed to compile CSS...
+        Stack trace or error details...
+
+  - type: textarea
+    id: generated-css
+    attributes:
+      label: Generated CSS (if applicable)
+      description: If the issue is with generated CSS output, paste the relevant CSS here
+      render: css
+      placeholder: |
+        .expected-class {
+          color: red;
+        }
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here (project setup, build tools, etc.)
