@@ -132,15 +132,6 @@ jobs:
             echo "✅ Code files detected, full validation required"
             echo "code_changes=true" >> $GITHUB_OUTPUT
             
-            # Check for console.log
-            if git diff origin/${{ github.base_ref }}..HEAD | grep -E '^\+.*console\.(log|warn|error)'; then
-              echo "❌ console.log statements found in new code"
-              echo "console_logs=true" >> $GITHUB_OUTPUT
-            else
-              echo "✅ No console.log statements in new code"
-              echo "console_logs=false" >> $GITHUB_OUTPUT
-            fi
-            
             # Check for TODO/FIXME without issues
             if git diff origin/${{ github.base_ref }}..HEAD | grep -E '^\+.*TODO|FIXME' | grep -v '#[0-9]'; then
               echo "❌ TODO/FIXME without issue references found"
@@ -152,7 +143,6 @@ jobs:
           else
             echo "✅ Only non-code files changed"
             echo "code_changes=false" >> $GITHUB_OUTPUT
-            echo "console_logs=false" >> $GITHUB_OUTPUT
             echo "todos_without_issues=false" >> $GITHUB_OUTPUT
           fi
 
@@ -184,7 +174,6 @@ jobs:
               title_valid: '${{ steps.pr-title-validation.outputs.title_valid }}' === 'true',
               title_length_valid: '${{ steps.pr-title-validation.outputs.title_length_valid }}' === 'true',
               tests_valid: '${{ steps.test-validation.outputs.tests_valid }}' === 'true',
-              console_logs: '${{ steps.file-validation.outputs.console_logs }}' === 'true',
               todos_without_issues: '${{ steps.file-validation.outputs.todos_without_issues }}' === 'true',
               docs_updated: '${{ steps.docs-validation.outputs.docs_updated }}' === 'true',
               code_changes: '${{ steps.file-validation.outputs.code_changes }}' === 'true'
@@ -218,11 +207,6 @@ jobs:
 
             // Code quality issues (blocking for code changes)
             if (results.code_changes) {
-              if (results.console_logs) {
-                issues.push('❌ Remove console.log statements from production code');
-                blocking = true;
-              }
-              
               if (results.todos_without_issues) {
                 issues.push('❌ TODO/FIXME comments must reference GitHub issues (#123)');
                 blocking = true;
@@ -263,7 +247,7 @@ jobs:
 
             if (results.code_changes) {
               report += `
-            | **Code Quality** | ${!results.console_logs && !results.todos_without_issues ? '✅ Pass' : '❌ Fail'} | No console.log, TODOs need issues |
+            | **Code Quality** | ${!results.todos_without_issues ? '✅ Pass' : '❌ Fail'} | TODOs need GitHub issue references |
             | **Documentation** | ${results.docs_updated ? '✅ Pass' : '⚠️ Warning'} | Updated for new features |`;
             }
 

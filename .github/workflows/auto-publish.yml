@@ -1,3 +1,5 @@
+name: Auto Publish to NPM
+
 # Auto-publish workflow for Bernova - CSS-in-JS styling framework
 #
 # Bernova is a CSS generation framework that allows writing CSS with JavaScript syntax
