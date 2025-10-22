@@ -14,7 +14,7 @@ export default defineConfig({
     outDir: 'dist',
 
     lib: {
-      entry: resolve(__dirname, 'src/app.js'),
+      entry: resolve(__dirname, 'src/index.js'),
       name: 'Bernova',
       formats: ['cjs'],
       fileName: () => 'index.js',
