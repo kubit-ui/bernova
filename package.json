@@ -83,8 +83,8 @@
     "url": "https://github.com/sponsors/kubit-ui"
   },
   "engines": {
-    "node": ">=22.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=8.0.0"
   },
   "publishConfig": {
     "access": "public",
