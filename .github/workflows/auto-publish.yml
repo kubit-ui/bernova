@@ -5,35 +5,24 @@ name: Auto Publish to NPM
 # Bernova is a CSS generation framework that allows writing CSS with JavaScript syntax
 # This workflow automatically publishes new versions to NPM when PRs are merged
 #
-# This workflow requires two secrets to be configured in the repository:
+# ⚠️  CRITICAL: This workflow requires two secrets to be configured in the repository:
 #
-# 1. NPM_TOKEN: An NPM automation token for publishing packages
-#    - Go to npmjs.com → Profile → Access Tokens → Generate New Token
-#    - Select "Automation" type (bypasses 2FA)
-#    - Ensure it has publish permissions for the bernova package
+# 1. NPM_TOKEN (REQUIRED): An NPM automation token for publishing packages
+#    Step-by-step setup:
+#    a) Go to https://www.npmjs.com/settings/tokens
+#    b) Click "Generate New Token" → Select "Automation" type
+#    c) Grant "Read and publish" permissions
+#    d) Copy the token and add it as a repository secret named NPM_TOKEN
+#    e) ⚠️ Must be AUTOMATION token (not Classic/Granular) to bypass 2FA
 #
-# 2. RELEASE_TOKEN: A GitHub Personal Access Token for bypassing branch protection
-#    - Go to github.com → Settings → Developer settings → Personal access tokens
-#    - Generate a "Classic" token with these permissions:
-#      - repo (Full control of private repositories)
-#      - workflow (Update GitHub Action workflows)
-#    - OR use Fine-grained PAT with "Contents: write" and "Pull requests: write"
-#    - If cms branch is protected, ensure the token can bypass pull request requirements   # If cms branch is protected, ensure the token can bypass pull request requirementssh to NPM
-
-# This workflow requires two secrets to be configured in the repository:
+# 2. RELEASE_TOKEN (Optional, for protected branches): GitHub Personal Access Token
+#    Step-by-step setup:
+#    a) Go to GitHub → Settings → Developer settings → Personal access tokens
+#    b) Generate "Classic" token with permissions: repo + workflow
+#    c) Add as repository secret named RELEASE_TOKEN
+#    d) Required only if main/cms branch has protection rules
 #
-# 1. NPM_TOKEN: An NPM automation token for publishing packages
-#    - Go to npmjs.com → Profile → Access Tokens → Generate New Token
-#    - Select "Automation" type (bypasses 2FA)
-#    - Ensure it has publish permissions for your package
-#
-# 2. RELEASE_TOKEN: A GitHub Personal Access Token for bypassing branch protection
-#    - Go to github.com → Settings → Developer settings → Personal access tokens
-#    - Generate a "Classic" token with these permissions:
-#      - repo (Full control of private repositories)
-#      - workflow (Update GitHub Action workflows)
-#    - OR use Fine-grained PAT with "Contents: write" and "Pull requests: write"
-#    - If cms branch is protected, ensure the token can bypass pull request requirements
+# 🔧 Troubleshooting: If publish fails with ENEEDAUTH, check NPM_TOKEN configuration
 
 on:
   pull_request:
@@ -145,7 +134,7 @@ jobs:
         run: |
           BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
-          
+
           echo "Analyzing PR for version bump..."
           echo "Branch: $BRANCH_NAME"
           echo "Title: $PR_TITLE"
@@ -259,6 +248,30 @@ jobs:
           [skip ci]"
 
           git tag "v$NEW_VERSION" -m "Release v$NEW_VERSION"
+
+      - name: Verify NPM authentication
+        if: steps.validate-branch.outputs.should_publish == 'true'
+        run: |
+          echo "Verifying NPM authentication..."
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "❌ NPM_TOKEN secret is not configured"
+            echo "Please add NPM_TOKEN secret in repository settings"
+            exit 1
+          fi
+
+          echo "✅ NPM_TOKEN secret is present"
+          echo "Testing NPM authentication..."
+
+          # Test authentication
+          if npm whoami; then
+            echo "✅ NPM authentication successful"
+          else
+            echo "❌ NPM authentication failed"
+            echo "Token may be invalid, expired, or not an automation token"
+            exit 1
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Dry run publish (verification)
         if: steps.validate-branch.outputs.should_publish == 'true'
@@ -425,20 +438,29 @@ jobs:
             - **Package Issues**: Ensure package.json and main entry point are valid
 
             ### 🔐 Required Secrets Configuration
-            1. **NPM_TOKEN**: 
-               - Type: "Automation" token from npmjs.com
-               - Scope: Access to publish the bernova package
+            1. **NPM_TOKEN** (❗ REQUIRED):
+               - Go to [npmjs.com](https://www.npmjs.com) → Account → Access Tokens → Generate New Token
+               - Select **"Automation"** type (bypasses 2FA if enabled)
+               - Grant **"Read and publish"** permissions
+               - Copy token and add as repository secret named \`NPM_TOKEN\`
+               - ⚠️ Must be an **Automation token**, not Classic or Granular
 
             2. **RELEASE_TOKEN** (Required for protected branches):
-               - Type: Personal Access Token with bypass permissions
-               - Permissions: "Contents: write", "Pull requests: write"
-               - Special: "Bypass pull request requirements" if needed
+               - Go to GitHub → Settings → Developer settings → Personal access tokens
+               - Generate **"Classic"** token with these permissions:
+                 - \`repo\` (Full control of repositories)
+                 - \`workflow\` (Update GitHub Action workflows)
+               - Add as repository secret named \`RELEASE_TOKEN\`
 
-            ### 📞 Next Steps
-            1. **NPM Issues**: Verify NPM_TOKEN is an automation token
-            2. **Branch Protection**: Add RELEASE_TOKEN secret with bypass permissions
-            3. **Logs**: Check error logs for specific authentication issues
-            4. **Manual Process**: Create a new PR if tokens can't be configured`;
+            ### 📞 Debugging Steps
+            1. **Check NPM_TOKEN**: Ensure it's an "Automation" token with publish permissions
+            2. **Test Locally**: Run \`npm login\` and \`npm whoami\` to verify token works
+            3. **Repository Secrets**: Verify secrets are added in Settings → Secrets and variables → Actions
+            4. **Token Expiry**: NPM automation tokens don't expire, but check if accidentally deleted
+            5. **Package Permissions**: Ensure token owner has publish rights to the \`bernova\` package
+
+            ### 🚨 Quick Fix
+            If urgent, create NPM_TOKEN secret with a fresh automation token from npmjs.com`;
 
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
