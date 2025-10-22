@@ -145,14 +145,14 @@ jobs:
         run: |
           BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
-
+          
           echo "Analyzing PR for version bump..."
           echo "Branch: $BRANCH_NAME"
           echo "Title: $PR_TITLE"
 
           # 1. Check explicit breaking change markers
-          if echo "$PR_BODY" | grep -qi "BREAKING CHANGE:" || \
+          # Use GitHub context directly to avoid shell injection issues
+          if [[ "${{ contains(github.event.pull_request.body, 'BREAKING CHANGE:') }}" == "true" ]] || \
              echo "$PR_TITLE" | grep -q "!" || \
              echo "$PR_TITLE" | grep -qi "\[breaking\]" || \
              [[ $BRANCH_NAME =~ ^break/ ]] || \
