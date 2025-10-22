@@ -16,7 +16,9 @@
     "dist",
     "src",
     "types",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "dist": "yarn run build",
@@ -45,9 +47,49 @@
     "clean": "rm -rf dist types",
     "postinstall": "echo 'postinstall'"
   },
-  "keywords": [],
-  "author": "Kubit team",
+  "keywords": [
+    "css",
+    "css-in-js",
+    "javascript",
+    "typescript",
+    "styling",
+    "frontend",
+    "web-development",
+    "build-tool",
+    "postcss",
+    "themes"
+  ],
+  "author": {
+    "name": "Kubit team",
+    "url": "https://github.com/kubit-ui"
+  },
+  "contributors": [
+    {
+      "name": "Kubit team",
+      "url": "https://github.com/kubit-ui"
+    }
+  ],
   "license": "ISC",
+  "homepage": "https://github.com/kubit-ui/bernova#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubit-ui/bernova.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kubit-ui/bernova/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/kubit-ui"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "autoprefixer": "^10.4.21",
     "cssnano": "^7.1.1",
