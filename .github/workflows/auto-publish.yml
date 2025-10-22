@@ -97,8 +97,8 @@ jobs:
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           echo "Package name: $PACKAGE_NAME"
 
-          # Verify cms entry point exists  
-          MAIN_FILE=$(node -p "require('./package.json').cms")
+          # Verify main entry point exists  
+          MAIN_FILE=$(node -p "require('./package.json').main")
           if [ ! -f "$MAIN_FILE" ]; then
             echo "Main file $MAIN_FILE does not exist"
             echo "Building the project first..."
@@ -422,7 +422,7 @@ jobs:
             - **Release Token**: Add RELEASE_TOKEN secret to bypass branch protection rules
             - **Token Permissions**: Check that tokens have correct permissions
             - **Version Conflict**: Check if version already exists in NPM
-            - **Package Issues**: Ensure package.json and cms entry point are valid
+            - **Package Issues**: Ensure package.json and main entry point are valid
 
             ### 🔐 Required Secrets Configuration
             1. **NPM_TOKEN**: 

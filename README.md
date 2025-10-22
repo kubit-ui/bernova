@@ -1,8 +1,8 @@
 <p align="center">
   <a href="https://kubit-ui.com">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./assets/bernova.png">
-      <img src="./assets/bernova.png" width="70%">
+      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/kubit-ui/bernova/raw/cms/assets/bernova.png">
+      <img src="https://github.com/kubit-ui/bernova/raw/cms/assets/bernova.png" width="70%">
     </picture>
   </a>
 </p>
