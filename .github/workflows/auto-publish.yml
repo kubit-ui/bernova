@@ -235,8 +235,8 @@ jobs:
 
           # Commit and tag
           git add package.json
-          # Add lock file if it exists
-          if [ -f "package-lock.json" ]; then
+          # Add lock file only if it exists and is not ignored
+          if [ -f "package-lock.json" ] && ! git check-ignore package-lock.json; then
             git add package-lock.json
           fi
           git commit -m "chore(release): $NEW_VERSION
