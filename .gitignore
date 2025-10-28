@@ -7,3 +7,4 @@ coverage/
 __reports__
 yarn.lock
 dist
+package-lock.json
