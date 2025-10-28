@@ -5,6 +5,41 @@ All notable changes to Bernova will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2025-10-28
+
+### 🔧 Changed
+
+- **License update**: Changed project license from ISC to Apache-2.0 for better open source compliance
+- **Package management**: Improved gitignore configuration to exclude package-lock.json for better npm/yarn compatibility
+
+### 🗑️ Removed
+
+- Removed package-lock.json file from version control to avoid package manager conflicts
+
+## [0.1.1] - 2025-10-22
+
+### 🐛 Fixed
+
+- **Build system**: Resolved NPM versioning and authentication issues
+- **Package metadata**: Improved package.json with complete metadata for open source distribution
+- **Workflow automation**: Fixed auto-publish workflow build validation and authentication verification
+
+### 🔧 Changed
+
+- **Node.js compatibility**: Updated minimum Node.js version requirements
+- **Build optimization**: Enhanced build process for better distribution
+
+## [0.1.0] - 2025-10-21
+
+All notable changes to Bernova will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.2] - 2025-10-28
+
+## [0.1.1] - 2025-10-21
+
 ## [0.1.0] - 2025-10-21
 
 ### 🎉 Initial Release
