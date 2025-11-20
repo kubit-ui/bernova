@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-We take the security of our project seriously. If you discover any security vulnerabilities, please report them to our security team by emailing [ kubit.lab.dev@gmail.com](mailto: kubit.lab.dev@gmail.com). We appreciate your help in responsibly disclosing any issues to us.
+We take the security of our project seriously. If you discover any security vulnerabilities, please report them to our security team by emailing [kubit.lab.dev@gmail.com](mailto:kubit.lab.dev@gmail.com). We appreciate your help in responsibly disclosing any issues to us.
 
 Please include the following details in your report:
 
