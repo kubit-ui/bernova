@@ -5,6 +5,37 @@ All notable changes to Bernova will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-01-30
+
+### ✨ New Features
+
+- **Modern Build System**: Migrated to Vite 7 with TypeScript configuration for improved build performance
+- **Dual Package Support**: Added ESM (`.mjs`) and CommonJS (`.cjs`) support for better compatibility across different module systems
+- **Custom Build Plugins**: Implemented 4 specialized Vite plugins:
+  - `copyCSSPlugin`: Minifies and copies CSS files
+  - `copyCLIBinariesPlugin`: Preserves CLI executables with proper shebangs
+  - `copySourcePlugin`: Minifies source files with aggressive optimization
+  - `removeTestFilesPlugin`: Ensures test files are excluded from distribution
+
+### 🚀 Performance Improvements
+
+- **Ultra-optimized Bundle**: Reduced package size from 56.4 KB to 41.4 KB (27% reduction)
+- **Aggressive Minification**: Implemented Terser with 3-pass optimization removing all comments
+- **Tree-shaking**: Enhanced dead code elimination for smaller bundles
+- **Zero JSDoc in Distribution**: Removed all TSDoc comments as they're unnecessary for CLI tools
+
+### 📚 Documentation
+
+- **Professional README**: Added comprehensive badges (npm version, downloads, license, coverage, PRs welcome)
+- **Package Distribution**: Created `.npmignore` to exclude unnecessary files from npm package
+- **Modern Package Exports**: Updated `package.json` with conditional exports for better module resolution
+
+### 🔧 Infrastructure
+
+- **TypeScript Build Configuration**: Separated development and production TypeScript configs (`tsconfig.build.json`)
+- **Node.js Compatibility**: Maintained Node.js >=20.0.0 target with ES2020 output
+- **Build Validation**: Enhanced CI/CD with proper build verification steps
+
 ## [0.1.2] - 2025-10-28
 
 ### 🔧 Changed
