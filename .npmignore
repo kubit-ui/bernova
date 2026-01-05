@@ -1,0 +1,109 @@
+# Test files
+**/*.test.*
+**/*.spec.*
+**/__tests__
+**/__mocks__
+**/__fixtures__
+**/tests
+
+# Development files
+**/*.map
+**/.tsbuildinfo
+.DS_Store
+Thumbs.db
+
+# Node modules (should never be in dist but just in case)
+**/node_modules
+
+# Source files (keep source in dist/src for compatibility)
+# But exclude from root
+src/__tests__/
+src/**/*.test.*
+src/**/*.md
+
+# Config files
+tsconfig*.json
+vite.config.*
+vitest.config.*
+vitest.setup.*
+.prettierrc*
+.htmlvalidate.json
+.jsbeautifyrc
+.babelrc
+
+# Git files
+.git/
+.github/
+.gitignore
+.gitattributes
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Documentation (keep only essential)
+CONTRIBUTING.md
+
+# Development directories
+__reports__/
+coverage/
+.nyc_output/
+bundle/
+public/
+scripts/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Lock files (keep only one)
+package-lock.json
+pnpm-lock.yaml
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+
+# Build artifacts
+*.tsbuildinfo
+.rollup.cache/
+
+# Assets not needed in package
+assets/
+bin/__tests__/
+
+# Keep only essential documentation
+*.md
+!README.md
+!LICENSE.md
+!CHANGELOG.md
+!SECURITY.md
+!CODE_OF_CONDUCT.md
