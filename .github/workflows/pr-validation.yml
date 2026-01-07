@@ -1,38 +1,74 @@
-name: PR Validationname: PR Validation & Quality Checks
+name: PR Validationname: PR Validationname: PR Validation & Quality Checks
 
 
 
-on:# This workflow validates PRs against project standards and coding guidelines
+on:
 
-  pull_request:# It runs on every PR to ensure code quality, documentation, and best practices
+  pull_request:
 
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]on:# This workflow validates PRs against project standards and coding guidelines
 
-    branches:on:
+    branches:
+
+      - cms  pull_request:# It runs on every PR to ensure code quality, documentation, and best practices
+
+      - master
+
+      - develop    types: [opened, synchronize, reopened]
+
+
+
+permissions:    branches:on:
+
+  contents: read
 
       - cms  pull_request:
 
-      - master    types: [opened, synchronize, reopened, edited]
+jobs:
+
+  test:      - master    types: [opened, synchronize, reopened, edited]
+
+    runs-on: ubuntu-latest
 
       - develop    branches:
 
-      - cms
+    steps:
+
+      - name: Checkout code      - cms
+
+        uses: actions/checkout@v4
 
 permissions:      - master
 
-  contents: read      - develop
+      - name: Setup Node.js
+
+        uses: actions/setup-node@v4  contents: read      - develop
+
+        with:
+
+          node-version: '20'
 
 
 
-jobs:permissions:
+      - name: Setup PNPMjobs:permissions:
 
-  test:  contents: read
+        uses: pnpm/action-setup@v4
+
+        with:  test:  contents: read
+
+          version: 10
 
     runs-on: ubuntu-latest  pull-requests: write
 
-  checks: write
+      - name: Install dependencies
 
-    steps:
+        run: pnpm install --frozen-lockfile  checks: write
+
+
+
+      - name: Run tests    steps:
+
+        run: pnpm test
 
       - name: Checkout codejobs:
 
