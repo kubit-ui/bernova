@@ -55,6 +55,9 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+
       - name: Validate branch patterns
         id: validate-branch
         run: |
@@ -73,11 +76,11 @@ jobs:
 
       - name: Install dependencies
         if: steps.validate-branch.outputs.should_publish == 'true'
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build project
         if: steps.validate-branch.outputs.should_publish == 'true'
-        run: npm run build
+        run: pnpm run build
 
       - name: Validate package integrity
         if: steps.validate-branch.outputs.should_publish == 'true'
@@ -91,7 +94,7 @@ jobs:
           if [ ! -f "$MAIN_FILE" ]; then
             echo "Main file $MAIN_FILE does not exist"
             echo "Building the project first..."
-            npm run build
+            pnpm run build
             if [ ! -f "$MAIN_FILE" ]; then
               echo "Main file $MAIN_FILE still does not exist after build"
               exit 1
@@ -211,7 +214,7 @@ jobs:
           PACKAGE_NAME=$(node -p "require('./package.json').name")
 
           # Check if version already exists in NPM
-          if npm view "$PACKAGE_NAME@$NEW_VERSION" version 2>/dev/null; then
+          if pnpm view "$PACKAGE_NAME@$NEW_VERSION" version 2>/dev/null; then
             echo "Version $NEW_VERSION already exists in NPM"
             exit 1
           fi
@@ -231,13 +234,13 @@ jobs:
           REASON="${{ steps.version-bump.outputs.reason }}"
 
           # Update package.json
-          npm version $NEW_VERSION --no-git-tag-version
+          pnpm version $NEW_VERSION --no-git-tag-version
 
           # Commit and tag
           git add package.json
           # Add lock file only if it exists and is not ignored
-          if [ -f "package-lock.json" ] && ! git check-ignore package-lock.json; then
-            git add package-lock.json
+          if [ -f "pnpm-lock.yaml" ] && ! git check-ignore pnpm-lock.yaml; then
+            git add pnpm-lock.yaml
           fi
           git commit -m "chore(release): $NEW_VERSION
 
@@ -263,7 +266,7 @@ jobs:
           echo "Testing NPM authentication..."
 
           # Test authentication
-          if npm whoami; then
+          if pnpm whoami; then
             echo "✅ NPM authentication successful"
           else
             echo "❌ NPM authentication failed"
@@ -277,7 +280,7 @@ jobs:
         if: steps.validate-branch.outputs.should_publish == 'true'
         run: |
           echo "Performing dry run..."
-          npm publish --dry-run --access public
+          pnpm publish --dry-run --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -292,9 +295,9 @@ jobs:
 
           if [[ "$VERSION_TYPE" == "major" ]]; then
             echo "Publishing MAJOR version $NEW_VERSION"
-            npm publish --access public --tag latest
+            pnpm publish --access public --tag latest --no-git-checks
           else
-            npm publish --access public --tag latest
+            pnpm publish --access public --tag latest --no-git-checks
           fi
 
           echo "Successfully published to NPM"
@@ -341,9 +344,7 @@ jobs:
 
             ### 📦 Installation
             ```bash
-            npm install bernova@${{ steps.version-bump.outputs.new_version }}
-            # or
-            yarn add bernova@${{ steps.version-bump.outputs.new_version }}
+            pnpm add bernova@${{ steps.version-bump.outputs.new_version }}
             ```
 
             ### 🔧 Usage
@@ -352,9 +353,9 @@ jobs:
             const { generateCSS } = require('bernova');
 
             // Use CLI
-            npx bernova
-            npx bv-config  // Create config file
-            npx bv-build   // Build styles
+            pnpm dlx bernova
+            pnpm dlx bv-config  // Create config file
+            pnpm dlx bv-build   // Build styles
             ```
 
             ### 🔗 Links
@@ -390,9 +391,7 @@ jobs:
 
             ### 📦 Installation
             \`\`\`bash
-            npm install bernova@${new_version}
-            # or
-            yarn add bernova@${new_version}
+            pnpm add bernova@${new_version}
             \`\`\`
 
             ### 🔧 Usage Example
@@ -401,9 +400,9 @@ jobs:
             const { generateCSS } = require('bernova');
 
             // CLI usage
-            npx bernova
-            npx bv-config  // Create config file
-            npx bv-build   // Build styles
+            pnpm dlx bernova
+            pnpm dlx bv-config  // Create config file
+            pnpm dlx bv-build   // Build styles
             \`\`\`
 
             ### ✅ Completed Steps
@@ -454,7 +453,7 @@ jobs:
 
             ### 📞 Debugging Steps
             1. **Check NPM_TOKEN**: Ensure it's an "Automation" token with publish permissions
-            2. **Test Locally**: Run \`npm login\` and \`npm whoami\` to verify token works
+            2. **Test Locally**: Run \`pnpm login\` and \`pnpm whoami\` to verify token works
             3. **Repository Secrets**: Verify secrets are added in Settings → Secrets and variables → Actions
             4. **Token Expiry**: NPM automation tokens don't expire, but check if accidentally deleted
             5. **Package Permissions**: Ensure token owner has publish rights to the \`bernova\` package
