@@ -1,62 +1,131 @@
-name: Auto Publish to NPM
+name: Auto Publish to NPMname: Auto Publish to NPM
 
-# Auto-publish workflow for Bernova - CSS-in-JS styling framework
+
+
+on:# Auto-publish workflow for Bernova - CSS-in-JS styling framework
+
+  pull_request:#
+
+    types: [closed]# Bernova is a CSS generation framework that allows writing CSS with JavaScript syntax
+
+    branches:# This workflow automatically publishes new versions to NPM when PRs are merged
+
+      - cms#
+
+      - master# ⚠️  CRITICAL: This workflow requires two secrets to be configured in the repository:
+
 #
-# Bernova is a CSS generation framework that allows writing CSS with JavaScript syntax
-# This workflow automatically publishes new versions to NPM when PRs are merged
-#
-# ⚠️  CRITICAL: This workflow requires two secrets to be configured in the repository:
-#
-# 1. NPM_TOKEN (REQUIRED): An NPM automation token for publishing packages
-#    Step-by-step setup:
+
+permissions:# 1. NPM_TOKEN (REQUIRED): An NPM automation token for publishing packages
+
+  contents: write#    Step-by-step setup:
+
 #    a) Go to https://www.npmjs.com/settings/tokens
-#    b) Click "Generate New Token" → Select "Automation" type
-#    c) Grant "Read and publish" permissions
-#    d) Copy the token and add it as a repository secret named NPM_TOKEN
-#    e) ⚠️ Must be AUTOMATION token (not Classic/Granular) to bypass 2FA
-#
-# 2. RELEASE_TOKEN (Optional, for protected branches): GitHub Personal Access Token
-#    Step-by-step setup:
-#    a) Go to GitHub → Settings → Developer settings → Personal access tokens
-#    b) Generate "Classic" token with permissions: repo + workflow
-#    c) Add as repository secret named RELEASE_TOKEN
-#    d) Required only if main/cms branch has protection rules
-#
-# 🔧 Troubleshooting: If publish fails with ENEEDAUTH, check NPM_TOKEN configuration
 
-on:
-  pull_request:
+jobs:#    b) Click "Generate New Token" → Select "Automation" type
+
+  publish:#    c) Grant "Read and publish" permissions
+
+    if: github.event.pull_request.merged == true#    d) Copy the token and add it as a repository secret named NPM_TOKEN
+
+    runs-on: ubuntu-latest#    e) ⚠️ Must be AUTOMATION token (not Classic/Granular) to bypass 2FA
+
+#
+
+    steps:# 2. RELEASE_TOKEN (Optional, for protected branches): GitHub Personal Access Token
+
+      - name: Checkout#    Step-by-step setup:
+
+        uses: actions/checkout@v4#    a) Go to GitHub → Settings → Developer settings → Personal access tokens
+
+        with:#    b) Generate "Classic" token with permissions: repo + workflow
+
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}#    c) Add as repository secret named RELEASE_TOKEN
+
+#    d) Required only if main/cms branch has protection rules
+
+      - name: Setup Node.js#
+
+        uses: actions/setup-node@v4# 🔧 Troubleshooting: If publish fails with ENEEDAUTH, check NPM_TOKEN configuration
+
+        with:
+
+          node-version: '20'on:
+
+          registry-url: 'https://registry.npmjs.org'  pull_request:
+
     types: [closed]
-    branches:
-      - cms
-      - master
+
+      - name: Setup PNPM    branches:
+
+        uses: pnpm/action-setup@v4      - cms
+
+        with:      - master
+
+          version: 10
 
 permissions:
-  contents: write
-  pull-requests: write
+
+      - name: Install dependencies  contents: write
+
+        run: pnpm install --frozen-lockfile  pull-requests: write
+
   packages: write
-  actions: read
+
+      - name: Build  actions: read
+
+        run: pnpm run build
 
 jobs:
-  auto-publish:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Determine version bump  auto-publish:
 
-      - name: Setup Node.js
+        id: version    if: github.event.pull_request.merged == true
+
+        run: |    runs-on: ubuntu-latest
+
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+
+              steps:
+
+          if [[ "$BRANCH" =~ ^(break|breaking)/ ]]; then      - name: Checkout code
+
+            echo "type=major" >> $GITHUB_OUTPUT        uses: actions/checkout@v4
+
+          elif [[ "$BRANCH" =~ ^(feat|feature)/ ]]; then        with:
+
+            echo "type=minor" >> $GITHUB_OUTPUT          fetch-depth: 0
+
+          else          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+            echo "type=patch" >> $GITHUB_OUTPUT
+
+          fi      - name: Setup Node.js
+
         uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
 
-      - name: Validate branch patterns
-        id: validate-branch
+      - name: Update version        with:
+
+        run: |          node-version: '20'
+
+          git config user.name "github-actions[bot]"          registry-url: 'https://registry.npmjs.org'
+
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          pnpm version ${{ steps.version.outputs.type }} -m "chore: release %s"      - name: Setup PNPM
+
+          git push --follow-tags        uses: pnpm/action-setup@v4
+
+        with:
+
+      - name: Publish to NPM          version: 10
+
+        run: pnpm publish --access public --no-git-checks
+
+        env:      - name: Validate branch patterns
+
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}        id: validate-branch
+
         run: |
           BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
           echo "Branch name: $BRANCH_NAME"
@@ -73,11 +142,11 @@ jobs:
 
       - name: Install dependencies
         if: steps.validate-branch.outputs.should_publish == 'true'
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build project
         if: steps.validate-branch.outputs.should_publish == 'true'
-        run: npm run build
+        run: pnpm run build
 
       - name: Validate package integrity
         if: steps.validate-branch.outputs.should_publish == 'true'
@@ -230,14 +299,14 @@ jobs:
           BRANCH_NAME="${{ steps.validate-branch.outputs.branch_name }}"
           REASON="${{ steps.version-bump.outputs.reason }}"
 
-          # Update package.json
-          npm version $NEW_VERSION --no-git-tag-version
+          # Update package.json using pnpm
+          pnpm version $NEW_VERSION --no-git-tag-version
 
           # Commit and tag
           git add package.json
           # Add lock file only if it exists and is not ignored
-          if [ -f "package-lock.json" ] && ! git check-ignore package-lock.json; then
-            git add package-lock.json
+          if [ -f "pnpm-lock.yaml" ] && ! git check-ignore pnpm-lock.yaml; then
+            git add pnpm-lock.yaml
           fi
           git commit -m "chore(release): $NEW_VERSION
 
@@ -263,7 +332,7 @@ jobs:
           echo "Testing NPM authentication..."
 
           # Test authentication
-          if npm whoami; then
+          if pnpm whoami; then
             echo "✅ NPM authentication successful"
           else
             echo "❌ NPM authentication failed"
@@ -277,7 +346,7 @@ jobs:
         if: steps.validate-branch.outputs.should_publish == 'true'
         run: |
           echo "Performing dry run..."
-          npm publish --dry-run --access public
+          pnpm publish --dry-run --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -292,9 +361,9 @@ jobs:
 
           if [[ "$VERSION_TYPE" == "major" ]]; then
             echo "Publishing MAJOR version $NEW_VERSION"
-            npm publish --access public --tag latest
+            pnpm publish --access public --tag latest --no-git-checks
           else
-            npm publish --access public --tag latest
+            pnpm publish --access public --tag latest --no-git-checks
           fi
 
           echo "Successfully published to NPM"
@@ -341,9 +410,9 @@ jobs:
 
             ### 📦 Installation
             ```bash
-            npm install bernova@${{ steps.version-bump.outputs.new_version }}
+            pnpm add bernova@${{ steps.version-bump.outputs.new_version }}
             # or
-            yarn add bernova@${{ steps.version-bump.outputs.new_version }}
+            npm install bernova@${{ steps.version-bump.outputs.new_version }}
             ```
 
             ### 🔧 Usage
@@ -390,9 +459,9 @@ jobs:
 
             ### 📦 Installation
             \`\`\`bash
-            npm install bernova@${new_version}
+            pnpm add bernova@${new_version}
             # or
-            yarn add bernova@${new_version}
+            npm install bernova@${new_version}
             \`\`\`
 
             ### 🔧 Usage Example

@@ -1,50 +1,103 @@
-name: PR Validation & Quality Checks
+name: PR Validationname: PR Validation & Quality Checks
 
-# This workflow validates PRs against project standards and coding guidelines
-# It runs on every PR to ensure code quality, documentation, and best practices
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, edited]
-    branches:
+
+on:# This workflow validates PRs against project standards and coding guidelines
+
+  pull_request:# It runs on every PR to ensure code quality, documentation, and best practices
+
+    types: [opened, synchronize, reopened]
+
+    branches:on:
+
+      - cms  pull_request:
+
+      - master    types: [opened, synchronize, reopened, edited]
+
+      - develop    branches:
+
       - cms
-      - master
-      - develop
 
-permissions:
-  contents: read
-  pull-requests: write
+permissions:      - master
+
+  contents: read      - develop
+
+
+
+jobs:permissions:
+
+  test:  contents: read
+
+    runs-on: ubuntu-latest  pull-requests: write
+
   checks: write
 
-jobs:
-  pr-validation:
-    runs-on: ubuntu-latest
-    name: Validate PR Standards
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup Node.js
+      - name: Checkout codejobs:
+
+        uses: actions/checkout@v4  pr-validation:
+
+    runs-on: ubuntu-latest
+
+      - name: Setup Node.js    name: Validate PR Standards
+
         uses: actions/setup-node@v4
+
+        with:    steps:
+
+          node-version: '20'      - name: Checkout code
+
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM        with:
+
+        uses: pnpm/action-setup@v4          fetch-depth: 0
+
         with:
-          node-version: '20'
+
+          version: 10      - name: Setup Node.js
+
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies        with:
+
+        run: pnpm install --frozen-lockfile          node-version: '20'
+
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Setup Yarn and dependencies
-        run: |
-          corepack enable
-          yarn --version
+      - name: Run tests
 
-          # Check if yarn.lock exists and install accordingly
-          if [ -f "yarn.lock" ]; then
-            echo "yarn.lock found - installing with frozen lockfile"
-            yarn install --frozen-lockfile --prefer-offline
+        run: pnpm test      - name: Setup PNPM
+
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Get PNPM store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup PNPM cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: |
+          echo "Installing dependencies with PNPM..."
+          
+          # Check if pnpm-lock.yaml exists and install accordingly
+          if [ -f "pnpm-lock.yaml" ]; then
+            echo "pnpm-lock.yaml found - installing with frozen lockfile"
+            pnpm install --frozen-lockfile --prefer-offline
           else
-            echo "No yarn.lock found - running fresh install"
-            yarn install
+            echo "No pnpm-lock.yaml found - running fresh install"
+            pnpm install
             echo "Dependencies installed and lockfile generated"
           fi
 
@@ -89,8 +142,8 @@ jobs:
         run: |
           echo "Running tests..."
 
-          if yarn run --help | grep -q "test"; then
-            if yarn test; then
+          if pnpm run --help | grep -q "test"; then
+            if pnpm test; then
               echo "✅ Tests passed"
               echo "tests_valid=true" >> $GITHUB_OUTPUT
             else

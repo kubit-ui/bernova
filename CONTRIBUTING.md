@@ -157,17 +157,17 @@ git commit -m "feat!: restructure CSS custom properties for better naming conven
 Before contributing, make sure you have the development environment set up:
 
 ```sh
-# Install dependencies
-npm install
+# Install dependencies (requires PNPM 9.0.0 or higher)
+pnpm install
 
 # Build the CSS framework
-npm run build
+pnpm run build
 
 # Run tests
-npm test
+pnpm test
 
 # Watch for changes during development
-npm run dev
+pnpm run dev
 ```
 
 ### CSS Guidelines
@@ -185,8 +185,8 @@ When contributing CSS code to bernova:
 
 Before submitting your PR:
 
-1. **Build the framework**: Run `npm run build` to ensure no build errors
+1. **Build the framework**: Run `pnpm run build` to ensure no build errors
 2. **Test functionality**: Verify your CSS works as expected
 3. **Check responsiveness**: Test on different screen sizes
 4. **Validate markup**: Ensure HTML examples are valid
-5. **Run automated tests**: Use `npm test` to run the test suite
+5. **Run automated tests**: Use `pnpm test` to run the test suite

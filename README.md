@@ -46,7 +46,7 @@
 ## Installation
 
 ```bash
-yarn add bernova
+pnpm add bernova
 ```
 
 ## Configuration
