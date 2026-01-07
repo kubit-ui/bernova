@@ -1,131 +1,67 @@
-name: Auto Publish to NPMname: Auto Publish to NPM
+name: Auto Publish to NPM
 
-
-
-on:# Auto-publish workflow for Bernova - CSS-in-JS styling framework
-
-  pull_request:#
-
-    types: [closed]# Bernova is a CSS generation framework that allows writing CSS with JavaScript syntax
-
-    branches:# This workflow automatically publishes new versions to NPM when PRs are merged
-
-      - cms#
-
-      - master# ⚠️  CRITICAL: This workflow requires two secrets to be configured in the repository:
-
+# Auto-publish workflow for Bernova - CSS-in-JS styling framework
 #
-
-permissions:# 1. NPM_TOKEN (REQUIRED): An NPM automation token for publishing packages
-
-  contents: write#    Step-by-step setup:
-
+# Bernova is a CSS generation framework that allows writing CSS with JavaScript syntax
+# This workflow automatically publishes new versions to NPM when PRs are merged
+#
+# ⚠️  CRITICAL: This workflow requires two secrets to be configured in the repository:
+#
+# 1. NPM_TOKEN (REQUIRED): An NPM automation token for publishing packages
+#    Step-by-step setup:
 #    a) Go to https://www.npmjs.com/settings/tokens
-
-jobs:#    b) Click "Generate New Token" → Select "Automation" type
-
-  publish:#    c) Grant "Read and publish" permissions
-
-    if: github.event.pull_request.merged == true#    d) Copy the token and add it as a repository secret named NPM_TOKEN
-
-    runs-on: ubuntu-latest#    e) ⚠️ Must be AUTOMATION token (not Classic/Granular) to bypass 2FA
-
+#    b) Click "Generate New Token" → Select "Automation" type
+#    c) Grant "Read and publish" permissions
+#    d) Copy the token and add it as a repository secret named NPM_TOKEN
+#    e) ⚠️ Must be AUTOMATION token (not Classic/Granular) to bypass 2FA
 #
-
-    steps:# 2. RELEASE_TOKEN (Optional, for protected branches): GitHub Personal Access Token
-
-      - name: Checkout#    Step-by-step setup:
-
-        uses: actions/checkout@v4#    a) Go to GitHub → Settings → Developer settings → Personal access tokens
-
-        with:#    b) Generate "Classic" token with permissions: repo + workflow
-
-          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}#    c) Add as repository secret named RELEASE_TOKEN
-
+# 2. RELEASE_TOKEN (Optional, for protected branches): GitHub Personal Access Token
+#    Step-by-step setup:
+#    a) Go to GitHub → Settings → Developer settings → Personal access tokens
+#    b) Generate "Classic" token with permissions: repo + workflow
+#    c) Add as repository secret named RELEASE_TOKEN
 #    d) Required only if main/cms branch has protection rules
+#
+# 🔧 Troubleshooting: If publish fails with ENEEDAUTH, check NPM_TOKEN configuration
 
-      - name: Setup Node.js#
-
-        uses: actions/setup-node@v4# 🔧 Troubleshooting: If publish fails with ENEEDAUTH, check NPM_TOKEN configuration
-
-        with:
-
-          node-version: '20'on:
-
-          registry-url: 'https://registry.npmjs.org'  pull_request:
-
+on:
+  pull_request:
     types: [closed]
-
-      - name: Setup PNPM    branches:
-
-        uses: pnpm/action-setup@v4      - cms
-
-        with:      - master
-
-          version: 10
+    branches:
+      - cms
+      - master
 
 permissions:
-
-      - name: Install dependencies  contents: write
-
-        run: pnpm install --frozen-lockfile  pull-requests: write
-
+  contents: write
+  pull-requests: write
   packages: write
-
-      - name: Build  actions: read
-
-        run: pnpm run build
+  actions: read
 
 jobs:
+  auto-publish:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
 
-      - name: Determine version bump  auto-publish:
-
-        id: version    if: github.event.pull_request.merged == true
-
-        run: |    runs-on: ubuntu-latest
-
-          BRANCH="${{ github.event.pull_request.head.ref }}"
-
-              steps:
-
-          if [[ "$BRANCH" =~ ^(break|breaking)/ ]]; then      - name: Checkout code
-
-            echo "type=major" >> $GITHUB_OUTPUT        uses: actions/checkout@v4
-
-          elif [[ "$BRANCH" =~ ^(feat|feature)/ ]]; then        with:
-
-            echo "type=minor" >> $GITHUB_OUTPUT          fetch-depth: 0
-
-          else          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
-
-            echo "type=patch" >> $GITHUB_OUTPUT
-
-          fi      - name: Setup Node.js
-
-        uses: actions/setup-node@v4
-
-      - name: Update version        with:
-
-        run: |          node-version: '20'
-
-          git config user.name "github-actions[bot]"          registry-url: 'https://registry.npmjs.org'
-
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          pnpm version ${{ steps.version.outputs.type }} -m "chore: release %s"      - name: Setup PNPM
-
-          git push --follow-tags        uses: pnpm/action-setup@v4
-
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
-      - name: Publish to NPM          version: 10
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
 
-        run: pnpm publish --access public --no-git-checks
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-        env:      - name: Validate branch patterns
-
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}        id: validate-branch
-
+      - name: Validate branch patterns
+        id: validate-branch
         run: |
           BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
           echo "Branch name: $BRANCH_NAME"
@@ -160,7 +96,7 @@ jobs:
           if [ ! -f "$MAIN_FILE" ]; then
             echo "Main file $MAIN_FILE does not exist"
             echo "Building the project first..."
-            npm run build
+            pnpm run build
             if [ ! -f "$MAIN_FILE" ]; then
               echo "Main file $MAIN_FILE still does not exist after build"
               exit 1
@@ -280,7 +216,7 @@ jobs:
           PACKAGE_NAME=$(node -p "require('./package.json').name")
 
           # Check if version already exists in NPM
-          if npm view "$PACKAGE_NAME@$NEW_VERSION" version 2>/dev/null; then
+          if pnpm view "$PACKAGE_NAME@$NEW_VERSION" version 2>/dev/null; then
             echo "Version $NEW_VERSION already exists in NPM"
             exit 1
           fi
@@ -299,7 +235,7 @@ jobs:
           BRANCH_NAME="${{ steps.validate-branch.outputs.branch_name }}"
           REASON="${{ steps.version-bump.outputs.reason }}"
 
-          # Update package.json using pnpm
+          # Update package.json
           pnpm version $NEW_VERSION --no-git-tag-version
 
           # Commit and tag
@@ -411,8 +347,6 @@ jobs:
             ### 📦 Installation
             ```bash
             pnpm add bernova@${{ steps.version-bump.outputs.new_version }}
-            # or
-            npm install bernova@${{ steps.version-bump.outputs.new_version }}
             ```
 
             ### 🔧 Usage
@@ -421,9 +355,9 @@ jobs:
             const { generateCSS } = require('bernova');
 
             // Use CLI
-            npx bernova
-            npx bv-config  // Create config file
-            npx bv-build   // Build styles
+            pnpm dlx bernova
+            pnpm dlx bv-config  // Create config file
+            pnpm dlx bv-build   // Build styles
             ```
 
             ### 🔗 Links
@@ -460,8 +394,6 @@ jobs:
             ### 📦 Installation
             \`\`\`bash
             pnpm add bernova@${new_version}
-            # or
-            npm install bernova@${new_version}
             \`\`\`
 
             ### 🔧 Usage Example
@@ -470,9 +402,9 @@ jobs:
             const { generateCSS } = require('bernova');
 
             // CLI usage
-            npx bernova
-            npx bv-config  // Create config file
-            npx bv-build   // Build styles
+            pnpm dlx bernova
+            pnpm dlx bv-config  // Create config file
+            pnpm dlx bv-build   // Build styles
             \`\`\`
 
             ### ✅ Completed Steps
@@ -523,7 +455,7 @@ jobs:
 
             ### 📞 Debugging Steps
             1. **Check NPM_TOKEN**: Ensure it's an "Automation" token with publish permissions
-            2. **Test Locally**: Run \`npm login\` and \`npm whoami\` to verify token works
+            2. **Test Locally**: Run \`pnpm login\` and \`pnpm whoami\` to verify token works
             3. **Repository Secrets**: Verify secrets are added in Settings → Secrets and variables → Actions
             4. **Token Expiry**: NPM automation tokens don't expire, but check if accidentally deleted
             5. **Package Permissions**: Ensure token owner has publish rights to the \`bernova\` package

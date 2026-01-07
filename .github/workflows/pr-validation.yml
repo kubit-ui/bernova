@@ -1,141 +1,45 @@
-name: PR Validationname: PR Validationname: PR Validation & Quality Checks
+name: PR Validation & Quality Checks
 
-
+# This workflow validates PRs against project standards and coding guidelines
+# It runs on every PR to ensure code quality, documentation, and best practices
 
 on:
-
   pull_request:
-
-    types: [opened, synchronize, reopened]on:# This workflow validates PRs against project standards and coding guidelines
-
+    types: [opened, synchronize, reopened, edited]
     branches:
-
-      - cms  pull_request:# It runs on every PR to ensure code quality, documentation, and best practices
-
+      - cms
       - master
+      - develop
 
-      - develop    types: [opened, synchronize, reopened]
-
-
-
-permissions:    branches:on:
-
+permissions:
   contents: read
-
-      - cms  pull_request:
+  pull-requests: write
+  checks: write
 
 jobs:
-
-  test:      - master    types: [opened, synchronize, reopened, edited]
-
+  pr-validation:
     runs-on: ubuntu-latest
-
-      - develop    branches:
+    name: Validate PR Standards
 
     steps:
-
-      - name: Checkout code      - cms
-
+      - name: Checkout code
         uses: actions/checkout@v4
-
-permissions:      - master
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
-
-        uses: actions/setup-node@v4  contents: read      - develop
-
+        uses: actions/setup-node@v4
         with:
-
           node-version: '20'
-
-
-
-      - name: Setup PNPMjobs:permissions:
-
-        uses: pnpm/action-setup@v4
-
-        with:  test:  contents: read
-
-          version: 10
-
-    runs-on: ubuntu-latest  pull-requests: write
-
-      - name: Install dependencies
-
-        run: pnpm install --frozen-lockfile  checks: write
-
-
-
-      - name: Run tests    steps:
-
-        run: pnpm test
-
-      - name: Checkout codejobs:
-
-        uses: actions/checkout@v4  pr-validation:
-
-    runs-on: ubuntu-latest
-
-      - name: Setup Node.js    name: Validate PR Standards
-
-        uses: actions/setup-node@v4
-
-        with:    steps:
-
-          node-version: '20'      - name: Checkout code
-
-        uses: actions/checkout@v4
-
-      - name: Setup PNPM        with:
-
-        uses: pnpm/action-setup@v4          fetch-depth: 0
-
-        with:
-
-          version: 10      - name: Setup Node.js
-
-        uses: actions/setup-node@v4
-
-      - name: Install dependencies        with:
-
-        run: pnpm install --frozen-lockfile          node-version: '20'
-
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Run tests
-
-        run: pnpm test      - name: Setup PNPM
-
+      - name: Setup PNPM
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Get PNPM store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup PNPM cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
-        run: |
-          echo "Installing dependencies with PNPM..."
-          
-          # Check if pnpm-lock.yaml exists and install accordingly
-          if [ -f "pnpm-lock.yaml" ]; then
-            echo "pnpm-lock.yaml found - installing with frozen lockfile"
-            pnpm install --frozen-lockfile --prefer-offline
-          else
-            echo "No pnpm-lock.yaml found - running fresh install"
-            pnpm install
-            echo "Dependencies installed and lockfile generated"
-          fi
+        run: pnpm install --frozen-lockfile
 
       - name: Validate Branch Naming
         id: branch-validation
