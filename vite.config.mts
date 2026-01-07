@@ -431,7 +431,7 @@ export default defineConfig(({ mode }) => ({
       ],
       insertTypesEntry: true,
       outDir: 'dist/types',
-      rollupTypes: true,
+      rollupTypes: false,
       tsconfigPath: './tsconfig.build.json',
     }),
     copyCSSPlugin(),
