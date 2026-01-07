@@ -7,14 +7,23 @@
   </a>
 </p>
 
-<p align="center">
-  <strong>The best way to write CSS with Javascript syntax</strong><br/>
-</p>
+<br />
 
-<p align="center">
-  <img src="https://img.shields.io/npm/v/bernova" alt="Version" />
-  <img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License" />
-</p>
+<div align="center">
+
+[![NPM Version](https://img.shields.io/npm/v/bernova?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/bernova)
+[![NPM Downloads](https://img.shields.io/npm/dm/bernova?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/bernova)
+[![License](https://img.shields.io/github/license/kubit-ui/bernova?style=for-the-badge&color=blue)](./LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/kubit-ui/bernova?style=for-the-badge&logo=github&color=yellow)](https://github.com/kubit-ui/bernova/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/kubit-ui/bernova?style=for-the-badge&logo=github&color=red)](https://github.com/kubit-ui/bernova/issues)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.3-646CFF?style=for-the-badge&logo=vite)](https://vitejs.dev/)
+
+</div>
+
+<br />
 
 ## Related Information
 
