@@ -39,14 +39,18 @@ const validatePreviouslyExists = async ({ stylesDir, compilerType, name }) => {
       const section = (() => {
         switch (compilerType) {
           case compilerTypeValid.foundationOnly:
-            return 'Components';
+            return 'COMPONENTS';
           case compilerTypeValid.componentOnly:
-            return 'Foundations';
+            return 'FOUNDATIONS';
           default:
             return '';
         }
       })();
-      dirs.oldData = extractDocFragment({ section, doc: oldCss });
+      dirs.oldData = extractDocFragment({
+        section: `=== BERNOVA ${section} ===`,
+        endSection: `=== END ${section} ===`,
+        doc: oldCss
+      });
     } catch {
       return dirs;
     }

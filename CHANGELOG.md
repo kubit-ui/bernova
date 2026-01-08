@@ -5,7 +5,19 @@ All notable changes to Bernova will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] - 2025-01-30
+## [1.0.0] - 2026-01-08
+
+### New Features
+
+- **Improve library styles and tools build/dist**: Complete the buildStyle.js cli function.
+- **Improve provider router hanler**: Improve the Bernova provider for handler relative doc routes.
+
+### Fixed
+
+- **Fixed the doc routes**: Change the absolute routes for relative routes into provides's stats.
+- **Fixed Error in partial transpilation**: Fixed the function for the flags --foundationsOnly and --componentsOnly.
+
+## [0.3.0] - 2026-01-01
 
 ### ✨ New Features
 

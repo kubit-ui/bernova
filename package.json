@@ -105,7 +105,11 @@
     "postcss-font-magician": "^4.0.0",
     "postcss-preset-env": "^10.4.0",
     "ts-node": "^10.9.2",
-    "typescript": "*"
+    "typescript": "*",
+    "terser": "^5.44.1",
+    "tsconfig-paths": "^4.2.0",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",

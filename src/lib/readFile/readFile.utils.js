@@ -18,6 +18,8 @@ register({
     esModuleInterop: true,
     allowJs: true,
     skipLibCheck: true, // Skip type checking for faster compilation
+    allowSyntheticDefaultImports: true,
+    checkJs: false
   },
 });
 
