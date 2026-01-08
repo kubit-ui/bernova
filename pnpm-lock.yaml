@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@babel/core':
+        specifier: ^7.28.5
+        version: 7.28.5
+      '@babel/preset-env':
+        specifier: ^7.28.5
+        version: 7.28.5(@babel/core@7.28.5)
       autoprefixer:
         specifier: ^10.4.21
         version: 10.4.23(postcss@8.5.6)
@@ -26,9 +32,15 @@ importers:
       postcss-preset-env:
         specifier: ^10.4.0
         version: 10.6.0(postcss@8.5.6)
+      terser:
+        specifier: ^5.44.1
+        version: 5.44.1
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
+      tsconfig-paths:
+        specifier: ^4.2.0
+        version: 4.2.0
       typescript:
         specifier: '*'
         version: 5.9.3
@@ -36,12 +48,6 @@ importers:
       '@babel/cli':
         specifier: ^7.28.3
         version: 7.28.3(@babel/core@7.28.5)
-      '@babel/core':
-        specifier: ^7.28.4
-        version: 7.28.5
-      '@babel/preset-env':
-        specifier: ^7.28.3
-        version: 7.28.5(@babel/core@7.28.5)
       '@vitejs/plugin-legacy':
         specifier: ^6.1.1
         version: 6.1.1(terser@5.44.1)(vite@6.4.1(@types/node@25.0.3)(terser@5.44.1))
@@ -66,12 +72,6 @@ importers:
       rollup-plugin-copy:
         specifier: ^3.5.0
         version: 3.5.0
-      terser:
-        specifier: ^5.44.0
-        version: 5.44.1
-      tsconfig-paths:
-        specifier: ^4.2.0
-        version: 4.2.0
       vite:
         specifier: ^6.3.6
         version: 6.4.1(@types/node@25.0.3)(terser@5.44.1)

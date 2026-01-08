@@ -32,6 +32,7 @@ const { simplifyName } = require('./simplifyName/simplifyName.utils.js');
 const {
   processMediaConfig,
 } = require('./processMediaConfig/processMediaConfig.util.js');
+const { buildRelativePath } = require('./buildRelativePath/buildRelativePath.utils.js');
 //* register
 const {
   generateThemeRegister,
@@ -56,6 +57,7 @@ module.exports = {
   fileExists,
   simplifyName,
   processMediaConfig,
+  buildRelativePath,
   generateThemeRegister,
   generateCssDoc,
 };

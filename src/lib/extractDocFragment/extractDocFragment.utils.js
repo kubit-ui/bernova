@@ -9,15 +9,17 @@
  * Extracts a specific section from CSS documentation using regex matching
  * Looks for content between matching comment markers
  *
- * @param {string} section - Name of the section to extract
- * @param {string} doc - CSS document content to search in
+ * @param {object}
+ * @param {string} param.section - Name of the section to extract
+ * @param {string} param.doc - CSS document content to search in
+ * @param {string} param.endSection - Optional different end section name
  * @returns {string} Extracted section content (trimmed) or empty string if not found
  */
-const extractDocFragment = ({ section, doc }) => {
+const extractDocFragment = ({ section, doc, endSection }) => {
+  const start = section;
+  const end = endSection || section;
   // Create regex pattern to match section markers
-  const matcher = new RegExp(
-    `/\\* ${section} \\*/([\\s\\S]*?)/\\* ${section} \\*/`
-  );
+  const matcher = new RegExp(`/\\* ${start} \\*/([\\s\\S]*?)/\\* ${end} \\*/`);
   const match = doc.match(matcher);
   return match ? match[1].trim() : '';
 };

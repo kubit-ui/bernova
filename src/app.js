@@ -10,6 +10,7 @@ const {
   generateThemeRegister,
   generateCssDoc,
   handlerForeignThemes,
+  buildRelativePath,
 } = require('./lib');
 const {
   validatePreviouslyExists,
@@ -59,7 +60,7 @@ async function bernovaStyles(compilerType) {
 
     const baseCss = await generateBaseCss({ fonts, resetCss, stylesPath });
 
-    const { theme, media, ...withoutTheme } = themeCss;
+    const { theme, media = [], ...withoutTheme } = themeCss;
     const source = (() => {
       switch (compilerType) {
         case compilerTypeValid.foundationOnly:
@@ -122,7 +123,7 @@ async function bernovaStyles(compilerType) {
       spinner.succeed(`No types tools found for theme: ${name}.`);
     }
 
-    const mediaDocs = processMediaConfig({ mediaConfig: media });
+    const mediaDocs = media ? processMediaConfig({ mediaConfig: media }) : null;
 
     // Generate development tools if configured (bvTools)
     spinner.start(`Processing bvTools for theme: ${name}...`);
@@ -143,20 +144,30 @@ async function bernovaStyles(compilerType) {
       spinner.succeed(`No bvTools found for theme: ${name}.`);
     }
 
-    const { themeByPosition, variablesExtracted, classesExtracted } =
-      await handlerForeignThemes({ dir, foreignThemes });
-
-    themeRegister[name] = generateThemeRegister({
-      cssPath: path.resolve(dir, stylesDir, `${name}.css`),
-      rootDocs,
-      stylesDocs,
-      globalDocs,
-      mediaDocs,
-      foreignStyles: classesExtracted,
-      foreignVars: variablesExtracted,
-      foreignBeforeFiles: themeByPosition.before,
-      foreignAfterFiles: themeByPosition.after,
-    });
+    if (provider) {
+      spinner.start(`Generating theme register for theme: ${name}...`);
+      // build a relative path to CSS file from provider
+      const providerDir = path.resolve(provider.path);
+      const cssPath = buildRelativePath({
+        from: providerDir,
+        to: path.join(stylesDir, `${name}.css`),
+      })
+      const { themeByPosition, variablesExtracted, classesExtracted } =
+        await handlerForeignThemes({ dir, providerDir, foreignThemes });
+      
+      themeRegister[name] = generateThemeRegister({
+        cssPath,
+        rootDocs,
+        stylesDocs,
+        globalDocs,
+        mediaDocs,
+        foreignStyles: classesExtracted,
+        foreignVars: variablesExtracted,
+        foreignBeforeFiles: themeByPosition.before,
+        foreignAfterFiles: themeByPosition.after,
+      });
+      spinner.succeed(`Theme register generated for provider for theme: ${name}`);
+    }
   }
 
   // Generate React/framework provider if configured

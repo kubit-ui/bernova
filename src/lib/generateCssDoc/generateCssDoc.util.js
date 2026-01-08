@@ -31,12 +31,12 @@ const generateCssDoc = ({
 
   // Generate foundations section (CSS variables, reset, base styles)
   const foundations = createFoundations
-    ? `/* === BERNOVA FOUNDATIONS === */\n${foundationsCss}\n/* === END FOUNDATIONS === */\n\n`
+    ? `/* === BERNOVA FOUNDATIONS === */\n${foundationsCss}/* === END FOUNDATIONS === */\n\n`
     : oldData;
 
   // Generate components section (component styles, utilities, media queries)
   const components = createComponents
-    ? `/* === BERNOVA COMPONENTS === */\n${stylesCss}\n/* === END COMPONENTS === */\n`
+    ? `/* === BERNOVA COMPONENTS === */\n${stylesCss}/* === END COMPONENTS === */\n`
     : oldData;
 
   // Combine sections into final CSS document

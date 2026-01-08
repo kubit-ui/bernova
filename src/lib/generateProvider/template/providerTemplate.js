@@ -26,7 +26,8 @@ export class $_Provider_$ {
       linkElement.rel = 'stylesheet';
       document.head.appendChild(linkElement);
     }
-    linkElement.href = url;
+    const href = new URL(url, import.meta.url).href;
+    linkElement.href = href;
   };
   #handlerThemes = (data) => {
     const { css, foreign } = data;
