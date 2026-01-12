@@ -1,6 +1,6 @@
 {
   "name": "bernova",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The best way to write CSS with Javascript syntax",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
