@@ -5,6 +5,17 @@ All notable changes to Bernova will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-01-12
+
+### Fixed
+
+- **Semantic problem solved**: change target for targets
+
+### Documentatation
+
+- **Added the bernova build script example**: Added the bv-build example.
+- **Added the instalation examples with anothers packages manager**: Added examples for `'npm'` and `'yarn`
+
 ## [1.0.0] - 2026-01-08
 
 ### New Features

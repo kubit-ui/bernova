@@ -257,7 +257,7 @@ async function transpileTo(code, filename, commonjs = false){
         '@babel/preset-env',
         {
           modules,
-          target: {
+          targets: {
             node: 'current',
           }
         }
