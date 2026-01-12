@@ -51,10 +51,20 @@
 - [Multi themes](#using-multi-themes)
 - [Provider](#library-provider)
 - [Foreign CSS documents](#foreign-css-documents)
+- [Compiler Options](#compiler-options)
 
 ## Installation
 
+You can install Bernova using your preferred package manager:
+
 ```bash
+# Using npm
+npm install bernova
+
+# Using yarn
+yarn add bernova
+
+# Using pnpm (recommended)
 pnpm add bernova
 ```
 
@@ -1790,6 +1800,12 @@ export const LOGIN_BUTTON = {
 ```
 
 ## Compiler Options
+
+There is a script provided by the library to generate a build/dist bundler is:
+
+```bash
+npx bv-build
+```
 
 When publishing our projects, depending of the packager configuration, it is necessary to move static files or other types of documents not originalle included. Bernova manages the files necessary for proper operation in production.
 
