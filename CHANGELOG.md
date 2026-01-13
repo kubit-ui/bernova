@@ -5,6 +5,20 @@ All notable changes to Bernova will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-01-13
+
+### New Features
+
+- **Added cli flags**: Added flags to overwrite css, tools and provider customOutDirs
+
+### Documentation
+
+- **Added documentation for cli flags**: Added documentation about the flags uses cases
+
+### Fixed
+
+- **Prevent transpile declaration files**: Added logic to prevent process typescript declaration files
+
 ## [1.0.1] - 2026-01-12
 
 ### Fixed
