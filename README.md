@@ -1853,3 +1853,21 @@ When publishing our projects, depending of the packager configuration, it is nec
  - `"css"`: Custom output path for CSS files
  - `"provider"`: Custom output path for provider file
  - `"tools"`: Custom output path for tools files (cssVars, cssClasses, etc)
+
+ ### Overwrite or set a single customOutDirs
+
+You may need to run the bv-build script in multiple outputs, and the bernova.config.json file configuration only supports one path. In these cases, you can use flags to specify the output path for the specific case.
+
+```bash
+# css case
+npx bv-build --css dist/custom/output
+
+# tools case
+npx bv-build --tools dist/custom/output
+
+# provider and stats case
+npx bv-build --provider dist/custom/output
+
+# full case
+npx bv-build --css dist/custom/output --tools dist/custom/output --provider dist/custom/output
+```

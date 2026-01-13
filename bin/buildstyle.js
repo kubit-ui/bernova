@@ -60,8 +60,11 @@ const {
     preventMoveJS,
     preventMoveDTS,
     types,
-    customOutDirs
+    customOutDirs: jsonCustomOutDirs,
   } = compilerOptions;
+  //* Resolve custom output directories
+  const cliCustomOutDirs = getBernovaBuildArgs();
+  const customOutDirs = overwriteCustomOutDirs({ jsonCustomOutDirs, cliCustomOutDirs });
   //* Get CSS files to process
   const cssFiles = getCssFiles({ themes, minifyCss });
   //* Get js files to process
@@ -148,6 +151,7 @@ async function writeJs({
   provider,
   type = '',
 }) {
+  const isDeclarationFile = jsFile.name.endsWith('.d.ts');
   const currentJsDir = path.resolve(dir, jsFile.path, jsFile.name);
   if (!fileExists(dir, currentJsDir)) {
     console.error(`File not found: ${currentJsDir}`);
@@ -169,10 +173,10 @@ async function writeJs({
     const blockModified = modifyThemesPath({ cssThemes, cssOutPath });
     jsDocFile = jsDocFile.replace(match, `export const cssThemes = {\n${blockModified}};\n`);
   }
-  if (type === 'cjs') {
+  if (type === 'cjs' && !isDeclarationFile) {
     jsDocFile = await transpileTo(jsDocFile, currentJsDir, true);
   }
-  if (type === 'esm') {
+  if (type === 'esm' && !isDeclarationFile) {
     jsDocFile = await transpileTo(jsDocFile, currentJsDir);
   }
   if (minifyJS) {
@@ -459,4 +463,38 @@ function pushUniqueFile(fileList, file) {
   if (!fileExists) {
     fileList.push(file);
   }
+}
+/**
+ *  Get Bernova bv-build args
+ * @returns {Record<string, string> | undefined
+ */
+function getBernovaBuildArgs() {
+  const validArgs = ['--css', '--tools', '--provider'];
+  const args = {};
+  for (let i = 0; i < process.argv.length; i++) {
+    if (validArgs.includes(process.argv[i])) {  
+      const key = process.argv[i].replace('--', '');
+      const value = process.argv[i + 1];
+      args[key] = value;
+      i++;
+    }
+  }
+  return Object.keys(args).length > 0 ? args : undefined;
+}
+/**
+ * Overwrite json customOutDirs with the cli customOutDirs
+ * @param {object} params
+ * @param {object} params.jsonCustomOutDirs
+ * @param {object} params.cliCustomOutDirs
+ * @returns {object | undefined}
+ */
+function overwriteCustomOutDirs({ jsonCustomOutDirs, cliCustomOutDirs }) {
+  let mergeOutDirs = {};
+  if (jsonCustomOutDirs) {
+    mergeOutDirs = { ...jsonCustomOutDirs }
+  }
+  if (cliCustomOutDirs) {
+    mergeOutDirs = { ...mergeOutDirs, ...cliCustomOutDirs }
+  }
+  return Object.keys(mergeOutDirs).length > 0 ? mergeOutDirs : undefined;
 }
