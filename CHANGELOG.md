@@ -5,11 +5,25 @@ All notable changes to Bernova will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.1] - 2026-01-13
+## [1.2.0] - 2026-01-14
 
 ### New Features
 
-- **Added cli flags**: Added flags to overwrite css, tools and provider customOutDirs
+- **Added new bv-build cli flags**: Added flags to overwrite baseOutDir, rootDir, preventMoveJS, preventMoveDTS and set preventProcessJS
+
+### Fixed
+
+- **Prevent minify declaration files**: Prevent minify with terser the typescript declaration files
+
+### Documentation
+
+- **Added the new flags documentation**: Added the documentation about the new flags cases
+
+## [1.1.0] - 2026-01-13
+
+### New Features
+
+- **Added cli bv-build flags**: Added flags to overwrite css, tools and provider customOutDirs
 
 ### Documentation
 
