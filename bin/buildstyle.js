@@ -53,22 +53,35 @@ const {
   //?   },
   //? };
   const {
-    baseOutDir,
-    rootDir,
+    baseOutDir: jsonBaseOutDir,
+    rootDir: jsonRootDir,
     minifyCss,
     minifyJS,
-    preventMoveJS,
-    preventMoveDTS,
-    types,
+    preventMoveJS: jsonPreventMoveJS,
+    preventMoveDTS: jsonPreventMoveDTS,
+    types: jsonTypes,
     customOutDirs: jsonCustomOutDirs,
   } = compilerOptions;
   //* Resolve custom output directories
-  const cliCustomOutDirs = getBernovaBuildArgs();
+  const {
+    baseOutDir: cliBaseOutDir,
+    rootDir: cliRootDir,
+    types: cliTypes,
+    preventMoveJs: cliPreventMoveJS,
+    preventMoveDts: cliPreventMoveDTS,
+    preventProcessJs = false,
+    ...cliCustomOutDirs
+  } = getBernovaBuildArgs();
+  const baseOutDir = cliBaseOutDir ?? jsonBaseOutDir ?? '';
+  const rootDir = cliRootDir ?? jsonRootDir ?? undefined;
+  const preventMoveJS = cliPreventMoveJS ?? jsonPreventMoveJS ?? false;
+  const preventMoveDTS = cliPreventMoveDTS ?? jsonPreventMoveDTS ?? false;
+  const types = cliTypes ?? jsonTypes ?? undefined;
   const customOutDirs = overwriteCustomOutDirs({ jsonCustomOutDirs, cliCustomOutDirs });
   //* Get CSS files to process
   const cssFiles = getCssFiles({ themes, minifyCss });
   //* Get js files to process
-  const jsFiles = getJsFiles({ provider, themes, preventMoveDTS });
+  const jsFiles = !preventProcessJs ? getJsFiles({ provider, themes, preventMoveDTS }) : [];
   //* Write files
   if (types && Array.isArray(types) && types.length > 0) {
     for (const type of types) {
@@ -179,7 +192,7 @@ async function writeJs({
   if (type === 'esm' && !isDeclarationFile) {
     jsDocFile = await transpileTo(jsDocFile, currentJsDir);
   }
-  if (minifyJS) {
+  if (minifyJS && !isDeclarationFile) {
     jsDocFile = await minifyJSFile(jsDocFile);
   }
   const adaptedOutDir = path.relative(rootDir || '', jsFile.path);
@@ -320,6 +333,7 @@ function getCssFiles({ themes, minifyCss }) {
           pushUniqueFile(acc, { name: foreignFileName, path: foreignFilePath });
         });
       }
+      return acc;
     }, [])
     : [];
 }
@@ -469,17 +483,33 @@ function pushUniqueFile(fileList, file) {
  * @returns {Record<string, string> | undefined
  */
 function getBernovaBuildArgs() {
-  const validArgs = ['--css', '--tools', '--provider'];
+  const validArgs = [
+    '--base-out-dir',
+    '--root-dir',
+    '--prevent-process-js',
+    '--prevent-move-js',
+    '--prevent-move-dts',
+    '--types',
+    '--css',
+    '--tools',
+    '--provider',
+  ];
   const args = {};
   for (let i = 0; i < process.argv.length; i++) {
     if (validArgs.includes(process.argv[i])) {  
-      const key = process.argv[i].replace('--', '');
+      const key = process.argv[i].replace('--', '').replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
       const value = process.argv[i + 1];
-      args[key] = value;
-      i++;
+      args[key] = (() => {
+        if (!value || validArgs.includes(value)) {
+          return true;
+        } else if (value.toLocaleLowerCase() === 'none') {
+          return '';
+        }
+        return value;
+      })()
     }
   }
-  return Object.keys(args).length > 0 ? args : undefined;
+  return args;
 }
 /**
  * Overwrite json customOutDirs with the cli customOutDirs

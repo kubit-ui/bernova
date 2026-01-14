@@ -1871,3 +1871,29 @@ npx bv-build --provider dist/custom/output
 # full case
 npx bv-build --css dist/custom/output --tools dist/custom/output --provider dist/custom/output
 ```
+
+There are other cases where you may need to override values set in the bernova.config.json document or set a specific value for a single case.
+
+**Important**: For affirmative Boolean values, it is sufficient to set the flag. And to remove values set in the bernova.config.json file, the word `'none'` is used.
+
+The flags available for this are:
+
+```bash
+# baseOutDir case
+npx bv-build --base-out-dir custom/base/out/dir
+
+# rootDir case
+npx bv-build --root-dir custom/root/dir
+
+# preventMoveJS case
+npx bv-build --prevent-move-js
+
+# preventMoveDTS case
+npx bv-build --prevent-move-dts
+
+# unset types values from bernova.config.json
+npx bv-build --types none
+
+# Prevent process the js ad dts files
+npx bv-build --prevent-process-js
+```
