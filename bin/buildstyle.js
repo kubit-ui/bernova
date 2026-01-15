@@ -220,7 +220,7 @@ async function writeCss({
 }){
   for(const cssFile of cssFiles) {
     const adaptedOutDir = (() => {
-      if (rootDir && customOutDirs?.css) {
+      if (rootDir && !customOutDirs?.css) {
         return path.relative(rootDir, cssFile.path);
       } else if (customOutDirs?.css) {
         return customOutDirs.css;
@@ -447,7 +447,7 @@ function modifyThemesPath({ cssThemes, cssOutPath }) {
       ? before.reduce((bacc, bcurr, bidx) => {
           const foreignDocName = path.basename(bcurr);
           if (bidx > 0) bacc += ', ';
-          bacc += `'${cssOutPath}${foreignDocName}'`;
+          bacc += `'${cssOutPath}/${foreignDocName}'`;
           return bacc;
         }, '')
       : '';
@@ -456,14 +456,15 @@ function modifyThemesPath({ cssThemes, cssOutPath }) {
       ? after.reduce((aacc, acurr, aidx) => {
           const foreignDocName = path.basename(acurr);
           if (aidx > 0) aacc += ', ';
-          aacc += `'${cssOutPath}${foreignDocName}'`;
+          aacc += `'${cssOutPath}/${foreignDocName}'`;
           return aacc;
         }, '')
       : '';
     //* build the final string
     const beforeArrayString = `before: [${beforeString}],`;
     const afterArrayString = `after: [${afterString}]`;
-    acc += `'${themeName}': { css: '${cssOutPath}${themeName}.css', foreign: { ${beforeArrayString} ${afterArrayString} } },\n`
+    acc += `'${themeName}': { css: '${cssOutPath}/${themeName}.css', foreign: { ${beforeArrayString} ${afterArrayString} } },\n`
+    return acc;
   }, '');
 }
 /**
