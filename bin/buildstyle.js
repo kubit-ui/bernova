@@ -83,22 +83,23 @@ const {
   //* Get js files to process
   const jsFiles = !preventProcessJs ? getJsFiles({ provider, themes, preventMoveDTS }) : [];
   //* Write files
-  if (types && Array.isArray(types) && types.length > 0) {
-    for (const type of types) {
-      const baseOutPath = getBaseOutDir({ baseOutDir, type });
-      if (cssFiles && cssFiles.length > 0) {
-        await writeCss({
-          baseOutPath,
-          cssFiles,
-          rootDir,
-          customOutDirs,
-          dir,
-        });
-      }
-      if (jsFiles && jsFiles.length > 0) {
+  const baseOutPath = getBaseOutDir({ baseOutDir });
+  if (cssFiles && cssFiles.length > 0) {
+    await writeCss({
+      baseOutPath,
+      cssFiles,
+      rootDir,
+      customOutDirs,
+      dir,
+    });
+  }
+  if (jsFiles && jsFiles.length > 0) {
+    if (types && Array.isArray(types) && types.length > 0) {
+      for (const type of types) {
+        const baseOutPathWithType = getBaseOutDir({ baseOutDir, type });
         for (const jsFile of jsFiles) {
           await writeJs({
-            baseOutPath,
+            baseOutPath: baseOutPathWithType,
             jsFile,
             rootDir,
             customOutDirs,
@@ -110,19 +111,7 @@ const {
           });
         }
       }
-    }
-  } else {
-    const baseOutPath = getBaseOutDir({ baseOutDir });
-    if (cssFiles && cssFiles.length > 0) {
-      await writeCss({
-        baseOutPath,
-        cssFiles,
-        rootDir,
-        customOutDirs,
-        dir,
-      });
-    }
-    if (jsFiles && jsFiles.length > 0) {
+    } else {
       for (const jsFile of jsFiles) {
         await writeJs({
           baseOutPath,
@@ -134,7 +123,7 @@ const {
           preventMoveJS,
           provider,
         });
-      } 
+      }
     }
   }
 })()
@@ -233,7 +222,7 @@ async function writeCss({
       await writeDoc(
         path.resolve(baseOutPath, adaptedOutDir, cssFile.name),
         cssDocFile,
-        cssFile.name,
+        cssFile.name.replace('.min', ''),
       );
     }
   }
