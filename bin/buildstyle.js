@@ -46,6 +46,7 @@ const {
   //?   preventMoveJS: boolean,
   //?   preventMoveDTS: boolean,
   //?   types: Array<'cjs' | 'esm'>,
+  //?   embedCss: boolean,
   //?   customOutDirs: {
   //?     css: string,
   //?     provider: string,
@@ -60,6 +61,7 @@ const {
     preventMoveJS: jsonPreventMoveJS,
     preventMoveDTS: jsonPreventMoveDTS,
     types: jsonTypes,
+    embedCss: jsonEmbedCss,
     customOutDirs: jsonCustomOutDirs,
   } = compilerOptions;
   //* Resolve custom output directories
@@ -70,6 +72,7 @@ const {
     preventMoveJs: cliPreventMoveJS,
     preventMoveDts: cliPreventMoveDTS,
     preventProcessJs = false,
+    embedCss: cliEmbedCss,
     ...cliCustomOutDirs
   } = getBernovaBuildArgs();
   const baseOutDir = cliBaseOutDir ?? jsonBaseOutDir ?? '';
@@ -77,6 +80,7 @@ const {
   const preventMoveJS = cliPreventMoveJS ?? jsonPreventMoveJS ?? false;
   const preventMoveDTS = cliPreventMoveDTS ?? jsonPreventMoveDTS ?? false;
   const types = cliTypes ?? jsonTypes ?? undefined;
+  const embedCss = cliEmbedCss ?? jsonEmbedCss ?? false;
   const customOutDirs = overwriteCustomOutDirs({ jsonCustomOutDirs, cliCustomOutDirs });
   //* Get CSS files to process
   const cssFiles = getCssFiles({ themes, minifyCss });
@@ -84,7 +88,7 @@ const {
   const jsFiles = !preventProcessJs ? getJsFiles({ provider, themes, preventMoveDTS }) : [];
   //* Write files
   const baseOutPath = getBaseOutDir({ baseOutDir });
-  if (cssFiles && cssFiles.length > 0) {
+  if (cssFiles && cssFiles.length > 0 && !embedCss) {
     await writeCss({
       baseOutPath,
       cssFiles,
@@ -108,6 +112,8 @@ const {
             preventMoveJS,
             provider,
             type,
+            embedCss,
+            cssFiles,
           });
         }
       }
@@ -122,6 +128,8 @@ const {
           minifyJS,
           preventMoveJS,
           provider,
+          embedCss,
+          cssFiles,
         });
       }
     }
@@ -135,11 +143,13 @@ const {
  * @param {{ name: string, path: string }} params.jsFile
  * @param {string} params.rootDir
  * @param {{ css?: string, provider?: string, tools?: string }} params.customOutDirs
- * @param {string} dir
- * @param {boolean} minifyJS
- * @param {boolean} preventMoveJS
+ * @param {string} params.dir
+ * @param {boolean} params.minifyJS
+ * @param {boolean} params.preventMoveJS
  * @param {{ name: string, path: string, declarationHelp?: boolean }} provider
  * @param {'cjs' | 'esm' | ''} [type]
+ * @param {boolean} params.embedCss
+ * @param {Array<{ name: string, path: string }>} params.cssFiles
  * @returns {Promises<void>}
  */
 async function writeJs({
@@ -152,6 +162,8 @@ async function writeJs({
   preventMoveJS,
   provider,
   type = '',
+  embedCss,
+  cssFiles,
 }) {
   const isDeclarationFile = jsFile.name.endsWith('.d.ts');
   const currentJsDir = path.resolve(dir, jsFile.path, jsFile.name);
@@ -160,20 +172,103 @@ async function writeJs({
     return;
   }
   let jsDocFile = await fs.readFile(currentJsDir, 'utf8');
-  if (jsFile.name === 'stats.js' && customOutDirs?.css) {
+  const processStatsFile = !!customOutDirs?.css || (embedCss && cssFiles.length > 0);
+  if (jsFile.name === 'stats.js' && processStatsFile) {
     const match = extractDocFragment({
       section: 'CssThemes',
       doc: jsDocFile
     });
     const block = match.replace(/export const cssThemes\s*=\s*/, '');
     const cssThemes = new Function(`return (${block})`)();
-    const adaptedProviderPath = path.relative(rootDir || '', provider.path);
-    const cssOutPath = buildRelativePath({
-      from: path.resolve(adaptedProviderPath),
-      to: path.resolve(dir, customOutDirs.css),
+    if (customOutDirs?.css) {
+      const adaptedProviderPath = path.relative(rootDir || '', provider.path);
+      const relativeOutPath = buildRelativePath({
+        from: path.resolve(adaptedProviderPath),
+        to: path.resolve(dir, customOutDirs.css),
+      });
+      const cssOutPath = type !== '' ? path.join('../', relativeOutPath) : relativeOutPath;
+      const blockModified = modifyThemesPath({ cssThemes, cssOutPath });
+      jsDocFile = jsDocFile.replace(match, `export const cssThemes = {\n${blockModified}};\n`);
+    } else if (embedCss && cssFiles.length > 0) {
+      const foreignContent = {};
+      const themesContent = await cssFiles.reduce(async (acc, { name: cssFileName, path: cssFilePath, parent: cssParent }) => {
+        const currentCssFilePath = path.resolve(dir, cssFilePath, cssFileName);
+        if (fileExists(dir, currentCssFilePath)) {
+          const cssFileContent = await fs.readFile(currentCssFilePath, 'utf8');
+          if (cssParent) {
+            cssParent.forEach((p) => {
+              const { name: parentName, position } = p;
+              if (!(parentName in foreignContent)) {
+                foreignContent[parentName] = { before: '', after: '' };
+              }
+              foreignContent[parentName][position] += cssFileContent.replace(/\s+/g, '');
+            })
+          } else{
+            const themeName = cssFileName.replace('.css', '').replace('.min', '');
+            if (!(themeName in acc)) {
+              acc[themeName] = '';
+            }
+            acc[themeName] += cssFileContent.replace(/\s+/g, '');
+          }
+        }
+        return acc;
+      }, {});
+      const valuesModified = Object.entries(themesContent).reduce((bacc, [themeName, content]) => {
+        const foreign = foreignContent[themeName] || { before: '', after: '' };
+        const fullCssContent = foreign.before + content + foreign.after;
+        bacc += `'${themeName}': { css: \`${fullCssContent}\` },\n`;
+        return bacc;
+      }, '');
+      const blockModified = `export const cssThemes = {\n${valuesModified}};\n`;
+      jsDocFile = jsDocFile.replace(match, blockModified);
+    }
+  }
+  if (jsFile.name === `${provider.name.toLocaleLowerCase()}.js` && processStatsFile) {
+    const newMethods = /* js */`
+    #linkBuilder = (css, id) => {
+      if (typeof document === 'undefined') return;
+      let styleElement = document.getElementById(id);
+      if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = id;
+        styleElement.type = 'text/css';
+        document.head.appendChild(styleElement);
+      }
+      styleElement.innerHTML = css;
+    };
+    #handlerThemes = (data) => {
+      const { css } = data;
+      this.#linkBuilder(css, this.#linkId);
+    };
+    #cleanUpLinks = () => {
+      if (typeof document === 'undefined') return;
+      const style = document.getElementById(this.#linkId);
+      if (style) style.remove();
+    };
+    `;
+    const providerTemplateDir = '../src/lib/generateProvider/template/providerTemplate.js';
+    let providerTemplate = await fs.readFile(path.resolve(__dirname, providerTemplateDir), 'utf8');
+    providerTemplate = providerTemplate.replace(/\$_Provider_\$/g, provider.name);
+    const match = extractDocFragment({
+      section: 'Bernova provider methods',
+      doc: providerTemplate,
     });
-    const blockModified = modifyThemesPath({ cssThemes, cssOutPath });
-    jsDocFile = jsDocFile.replace(match, `export const cssThemes = {\n${blockModified}};\n`);
+    jsDocFile = providerTemplate.replace(match, newMethods.trim());
+  }
+  if (jsFile.name === `${provider.name.toLocaleLowerCase()}.d.ts` && processStatsFile) {
+    const newMethods = /* ts */`
+    #linkBuilder(css: string, id: string): void;
+    #handlerThemes(data: { css: string }): void;
+    #cleanUpLinks(): void;
+    `;
+    const providerTemplateDir = '../src/lib/generateProvider/template/providerTemplate.d.ts';
+    let providerTemplate = await fs.readFile(path.resolve(__dirname, providerTemplateDir), 'utf8');
+    providerTemplate = providerTemplate.replace(/\$_Provider_\$/g, provider.name);
+    const match = extractDocFragment({
+      section: 'Bernova provider methods',
+      doc: providerTemplate,
+    });
+    jsDocFile = providerTemplate.replace(match, newMethods.trim());
   }
   if (type === 'cjs' && !isDeclarationFile) {
     jsDocFile = await transpileTo(jsDocFile, currentJsDir, true);
@@ -219,10 +314,11 @@ async function writeCss({
     const currentCssDir = path.resolve(dir, cssFile.path, cssFile.name);
     if (fileExists(dir, currentCssDir)) {
       const cssDocFile = await fs.readFile(currentCssDir, 'utf8');
+      const adaptedName = cssFile.name.replace('.min', '');
       await writeDoc(
-        path.resolve(baseOutPath, adaptedOutDir, cssFile.name),
+        path.resolve(baseOutPath, adaptedOutDir, adaptedName),
         cssDocFile,
-        cssFile.name.replace('.min', ''),
+        adaptedName,
       );
     }
   }
@@ -317,9 +413,20 @@ function getCssFiles({ themes, minifyCss }) {
       }
       if (foreignThemes && Array.isArray(foreignThemes) && foreignThemes.length > 0) {
         foreignThemes.forEach((foreignThm) => {
-          const foreignFileName = path.basename(foreignThm);
-          const foreignFilePath = foreignThm.replace(foreignFileName, '').trim();
-          pushUniqueFile(acc, { name: foreignFileName, path: foreignFilePath });
+          //? foreignThm example
+          //?{
+          //? "position": "before" | "after",
+          //? "name": string,
+          //? "path": string, [example: ./fixture/example.css]
+          //?}
+          const foreignFileName = path.basename(foreignThm.path);
+          const foreignFilePath = foreignThm.path.replace(foreignFileName, '').trim();
+          const foreignFileExists = acc.findIndex((f) => f.name === foreignFileName && f.path === foreignFilePath);
+          if (foreignFileExists >= 0) {
+            acc[foreignFileExists].parent.push({ name: styleName, position: foreignThm.position });
+          } else {
+            acc.push({ name: foreignFileName, path: foreignFilePath, parent: [{ name: styleName, position: foreignThm.position }] });
+          }
         });
       }
       return acc;
@@ -470,7 +577,7 @@ function pushUniqueFile(fileList, file) {
 }
 /**
  *  Get Bernova bv-build args
- * @returns {Record<string, string> | undefined
+ * @returns {Record<string, string> | undefined}
  */
 function getBernovaBuildArgs() {
   const validArgs = [
@@ -483,6 +590,7 @@ function getBernovaBuildArgs() {
     '--css',
     '--tools',
     '--provider',
+    '--embed-css'
   ];
   const args = {};
   for (let i = 0; i < process.argv.length; i++) {

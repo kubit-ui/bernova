@@ -17,6 +17,7 @@ export class $_Provider_$ {
   #themesMediaQueries;
   #linkId;
   #jsInCss;
+  /* Bernova provider methods */
   #linkBuilder = (url, id) => {
     if (typeof document === 'undefined') return;
     let linkElement = document.getElementById(id);
@@ -51,6 +52,7 @@ export class $_Provider_$ {
     const links = document.querySelectorAll(`link[id^="${this.#linkId}"]`);
     links.forEach((link) => link.remove());
   };
+  /* Bernova provider methods */
 
   constructor({ linkId, jsInCss } = {}) {
     this.#themes = cssThemes;
