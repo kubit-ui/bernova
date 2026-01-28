@@ -10,21 +10,19 @@ const fs = require('fs').promises;
 const path = require('path');
 const { fileExists } = require('../fileExists/fileExists.utils');
 const { simplifyName } = require('../simplifyName/simplifyName.utils');
-const { buildRelativePath } = require('../buildRelativePath/buildRelativePath.utils');
 
 /**
  * Processes and integrates foreign CSS theme files into Bernova compilation
  * Extracts CSS variables and class names from external stylesheets
  *
  * @param {string} dir - Base directory for resolving theme file paths
- * @param {string} providerDir - Directory of the provider for relative path calculation
  * @param {Array} foreignThemes - Array of foreign theme configurations
  * @param {string} foreignThemes[].path - Relative path to the theme CSS file
  * @param {string} foreignThemes[].position - Where to include ('before' or 'after')
  * @param {string} foreignThemes[].name - Theme identifier name
  * @returns {Object} Processed theme data with variables, classes, and file paths
  */
-const handlerForeignThemes = async ({ dir, providerDir, foreignThemes }) => {
+const handlerForeignThemes = async ({ dir, foreignThemes }) => {
   // Initialize data structures for organizing theme content
   const themeByPosition = { after: '', before: '' }; // File paths by position
   const classesExtracted = { doc: '', declare: '' }; // CSS class documentation
@@ -41,12 +39,6 @@ const handlerForeignThemes = async ({ dir, providerDir, foreignThemes }) => {
       
       // Build absolute path to the theme CSS file
       const themePathAbsolute = path.resolve(dir, themePath);
-      
-      // build a relative path to CSS file from provider location
-      const themeRoute = buildRelativePath({
-        from: providerDir,
-        to: themePathAbsolute
-      });
 
       // Read and parse theme CSS content
       const data = await fs.readFile(themePathAbsolute, 'utf-8');
@@ -55,8 +47,8 @@ const handlerForeignThemes = async ({ dir, providerDir, foreignThemes }) => {
       //   idx === 0 ? `'${themeRoute}'` : `, '${themeRoute}'`;
       themeByPosition[position] +=
         themeByPosition[position].length === 0
-          ? `'${themeRoute}'`
-          : `, '${themeRoute}'`;
+          ? `'${themePath}'`
+          : `, '${themePath}'`;
       //* get the css variables
       const variableMatches = data.match(/--[a-zA-Z0-9-_]+:\s*[^;]+;/g);
       if (variableMatches) {

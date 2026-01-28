@@ -12,8 +12,6 @@ const copyLocalFonts = async (localFonts, outputDir) => {
     console.log('No local fonts to copy.');
     return;
   }
-  const { default: ora } = await import('ora');
-  const spinner = ora('Copying local fonts...').start();
 
   try {
     for (const font of localFonts) {
@@ -30,11 +28,9 @@ const copyLocalFonts = async (localFonts, outputDir) => {
 
         // Copy the font file
         await fs.copyFile(srcPath, destPath);
-        spinner.succeed(`Copied ${srcPath} to ${destPath}`);
       }
     }
   } catch (error) {
-    spinner.fail('Failed to copy local fonts.');
     console.error(error);
   }
 };

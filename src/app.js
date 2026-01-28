@@ -10,7 +10,6 @@ const {
   generateThemeRegister,
   generateCssDoc,
   handlerForeignThemes,
-  buildRelativePath,
 } = require('./lib');
 const {
   validatePreviouslyExists,
@@ -146,14 +145,11 @@ async function bernovaStyles(compilerType) {
 
     if (provider) {
       spinner.start(`Generating theme register for theme: ${name}...`);
-      // build a relative path to CSS file from provider
-      const providerDir = path.resolve(provider.path);
-      const cssPath = buildRelativePath({
-        from: providerDir,
-        to: path.join(stylesDir, `${name}.css`),
-      })
+      const cssPath = stylesPath
+        ? path.join(stylesPath, `${name}.css`)
+        : path.join('./styles', `${name}.css`);
       const { themeByPosition, variablesExtracted, classesExtracted } =
-        await handlerForeignThemes({ dir, providerDir, foreignThemes });
+        await handlerForeignThemes({ dir, foreignThemes });
       
       themeRegister[name] = generateThemeRegister({
         cssPath,
