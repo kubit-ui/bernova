@@ -12,9 +12,6 @@ const { filterGenerateCss } = require('./helpers/filterGenerateCss.utils');
  * @returns {Promise<Object>} - A promise that resolves to an object containing the generated CSS and minified CSS.
  */
 const generateCSS = async ({ source, prefix, baseCss = '', compilerType }) => {
-  const { default: ora } = await import('ora');
-  const spinner = ora('Generating CSS...').start();
-
   try {
     const { stylesCss, foundationsCss, stylesDocs, rootDocs, globalDocs } =
       filterGenerateCss({
@@ -24,7 +21,6 @@ const generateCSS = async ({ source, prefix, baseCss = '', compilerType }) => {
         prefix,
       });
 
-    spinner.succeed('CSS generation completed successfully.');
     return {
       stylesCss,
       foundationsCss,
@@ -33,7 +29,6 @@ const generateCSS = async ({ source, prefix, baseCss = '', compilerType }) => {
       globalDocs,
     };
   } catch (error) {
-    spinner.fail('Error generating CSS.');
     console.error(error);
     throw error; // Re-throw the error after logging it
   }

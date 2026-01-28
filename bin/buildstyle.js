@@ -23,10 +23,9 @@ const {
   writeDoc,
   fileExists,
   readConfigData,
-  buildRelativePath,
 } = require('../src/lib');
 
-(async() => {
+(async () => {
   const dir = process.cwd();
   //* read bernova config
   const config = await readConfigData(path.resolve(dir, 'bernova.config.json'));
@@ -134,7 +133,7 @@ const {
       }
     }
   }
-})()
+})();
 
 /**
  * Write js files
@@ -181,13 +180,7 @@ async function writeJs({
     const block = match.replace(/export const cssThemes\s*=\s*/, '');
     const cssThemes = new Function(`return (${block})`)();
     if (customOutDirs?.css) {
-      const adaptedProviderPath = path.relative(rootDir || '', provider.path);
-      const relativeOutPath = buildRelativePath({
-        from: path.resolve(adaptedProviderPath),
-        to: path.resolve(dir, customOutDirs.css),
-      });
-      const cssOutPath = type !== '' ? path.join('../', relativeOutPath) : relativeOutPath;
-      const blockModified = modifyThemesPath({ cssThemes, cssOutPath });
+      const blockModified = modifyThemesPath({ cssThemes, cssOutPath: customOutDirs.css });
       jsDocFile = jsDocFile.replace(match, `export const cssThemes = {\n${blockModified}};\n`);
     } else if (embedCss && cssFiles.length > 0) {
       const foreignContent = {};

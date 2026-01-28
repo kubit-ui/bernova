@@ -9,8 +9,6 @@ const fs = require('fs/promises');
  * @param {string | Promise<string>} source - The CSS content to write.
  */
 const writeDoc = async (dir, source, docName) => {
-  const { default: ora } = await import('ora');
-  const spinner = ora(`Writing ${docName} to ${dir}...`).start();
   try {
     // Ensure the directory exists
     await fs.mkdir(path.dirname(dir), { recursive: true });
@@ -20,9 +18,7 @@ const writeDoc = async (dir, source, docName) => {
 
     // Write the CSS content to the file
     await fs.writeFile(dir, cssContent);
-    spinner.succeed(`${docName} successfully written to ${dir}`);
   } catch (err) {
-    spinner.fail(`Error writing ${docName} to ${dir}`);
     console.error(err);
   }
 };

@@ -17,9 +17,6 @@ const { bernovaStyles } = require('../src/app.js');
 const { compilerTypeValid } = require('../src/constants/compilerType.js');
 
 (async () => {
-  const { default: ora } = await import('ora');
-  const spinner = ora('Starting Bernova compilation process...').start();
-
   try {
     // Parse command line arguments to determine compilation type
     const args =
@@ -35,10 +32,7 @@ const { compilerTypeValid } = require('../src/constants/compilerType.js');
 
     // Execute the main compilation process
     await bernovaStyles(compilerType);
-
-    spinner.succeed('Bernova compilation process completed successfully.');
   } catch (error) {
-    spinner.fail('An error occurred during the Bernova compilation process.');
     console.error('Error details:', error.message);
     process.exit(1);
   }
