@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0
+
+### Minor Changes
+
+- Add documentation about changeset and automations workflows
+- Add documentation about changeset and automations workflows
+
 All notable changes to Bernova will be documented in this file.
 
 The format uses [Changesets](https://github.com/changesets/changesets) for automated version management and changelog generation.
