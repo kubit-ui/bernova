@@ -36,7 +36,6 @@ This project follows the **fork-based contribution model** to:
    ```
 
 5. **Make Changes**:
-
    - Make your changes to the bernova codebase
    - Follow the coding standards outlined in our style guide
    - Add or update tests for your changes
@@ -70,76 +69,271 @@ This project follows the **fork-based contribution model** to:
    - Fill out the PR template with details about your changes
    - Submit the pull request for review
 
-### Branch Naming & Automatic Publishing
+### Branch Naming & Automatic Publishing with Changesets
 
-This repository uses an **automatic publishing system** that determines the version bump based on your branch name and PR content. When your PR is merged, the package will be automatically published to NPM.
+This repository uses **[Changesets](https://github.com/changesets/changesets)** for automated version management and publishing. When your PR is merged, the package will be automatically versioned, changelog updated, and published to NPM.
 
-#### Branch Naming Patterns
+#### How It Works
 
-Use these branch prefixes for bernova to ensure automatic publishing works correctly:
+1. **You create a PR** with proper branch naming and conventional commit messages
+2. **Automated validation** checks your branch name, PR title, and code quality
+3. **On merge**, a changeset is auto-generated based on your branch type
+4. **Version is bumped** automatically (major/minor/patch)
+5. **CHANGELOG is updated** with your changes
+6. **Package is built and published** to NPM
+7. **GitHub Release is created** with release notes
+8. **PR comment** confirms the published version
 
-| Branch Pattern          | Version Bump | Example                      | Description                   |
-| ----------------------- | ------------ | ---------------------------- | ----------------------------- |
-| `feat/` or `feature/`   | **MINOR**    | `feat/grid-system`           | New CSS utilities or features |
-| `fix/` or `bugfix/`     | **PATCH**    | `fix/button-styling`         | Bug fixes in styles           |
-| `break/` or `breaking/` | **MAJOR**    | `break/remove-old-vars-api`  | Breaking API changes          |
-| `hotfix/`               | **PATCH**    | `hotfix/critical-layout-bug` | Urgent styling fixes          |
-| `chore/`                | **PATCH**    | `chore/update-deps`          | Maintenance tasks             |
+#### Branch Naming Patterns (Required)
 
-#### Advanced Version Detection
+Use these branch prefixes - they determine the version bump type:
 
-The system also analyzes your **PR title** and **description** for more precise version detection:
+| Branch Pattern          | Version Bump | Example                      | When to Use                           |
+| ----------------------- | ------------ | ---------------------------- | ------------------------------------- |
+| `feat/` or `feature/`   | **MINOR**    | `feat/grid-system`           | New features, CSS utilities, or APIs  |
+| `fix/` or `bugfix/`     | **PATCH**    | `fix/button-styling`         | Bug fixes in styles or functionality  |
+| `break/` or `breaking/` | **MAJOR**    | `break/remove-old-vars-api`  | Breaking changes to public API        |
+| `hotfix/`               | **PATCH**    | `hotfix/critical-layout-bug` | Urgent production fixes               |
+| `chore/`                | **PATCH**    | `chore/update-deps`          | Maintenance, deps, or refactoring     |
+| `docs/`                 | **PATCH**    | `docs/update-readme`         | Documentation only changes            |
+| `style/`                | **PATCH**    | `style/format-code`          | Code style/formatting changes         |
+| `refactor/`             | **PATCH**    | `refactor/simplify-logic`    | Code refactoring without new features |
+| `test/`                 | **PATCH**    | `test/add-unit-tests`        | Adding or updating tests              |
 
-##### MAJOR (Breaking Changes)
+#### PR Title Format (Required)
 
-- `BREAKING CHANGE:` in PR description
-- `!` in PR title (e.g., `feat!: redesign button API`)
-- `[breaking]` tag in PR title
-- Conventional commits with `!` (e.g., `feat(api)!: change interface`)
+Your PR title **must** follow [Conventional Commits](https://www.conventionalcommits.org/) format:
 
-##### MINOR (New Features)
+```
+<type>: <description>
+```
 
-- PR titles starting with `feat:` or `feature:`
-- `[feature]` tag in PR title
-- Conventional commits like `feat(css): add flexbox utilities`
+**Examples:**
 
-##### PATCH (Bug Fixes & Others)
+- ✅ `feat: add responsive grid system`
+- ✅ `fix: resolve button hover state issue`
+- ✅ `docs: update installation guide`
+- ✅ `refactor: simplify CSS generation logic`
+- ❌ `Added new feature` (missing type)
+- ❌ `fix button` (missing colon)
 
-- PR titles starting with `fix:` or `bugfix:`
-- All other changes (default behavior)
-- Conventional commits like `fix(button): hover state styling issue`
+**With scope (optional but recommended):**
 
-#### Examples for bernova
+```
+<type>(<scope>): <description>
+```
 
-**Adding a new CSS utility:**
+**Examples:**
+
+- ✅ `feat(css): add spacing utility classes`
+- ✅ `fix(build): resolve minification error`
+- ✅ `docs(readme): add usage examples`
+
+**Breaking changes:**
+
+```
+<type>!: <description>
+```
+
+or
+
+```
+<type>(<scope>)!: <description>
+```
+
+**Examples:**
+
+- ✅ `feat!: redesign CSS variable naming convention`
+- ✅ `refactor(api)!: change provider interface`
+
+#### Commit Message Guidelines
+
+While your commits don't directly affect versioning (the branch name does), **good commit messages are essential** for:
+
+- Code review clarity
+- Git history readability
+- Future maintenance
+- Team collaboration
+
+**Follow Conventional Commits:**
+
+```bash
+# Feature commits
+git commit -m "feat(css): add margin utility classes"
+git commit -m "feat(provider): add theme switching support"
+
+# Bug fix commits
+git commit -m "fix(build): resolve TypeScript compilation error"
+git commit -m "fix(styles): correct button padding in mobile view"
+
+# Documentation commits
+git commit -m "docs(readme): add installation instructions"
+git commit -m "docs(api): document CSS variable usage"
+
+# Refactoring commits
+git commit -m "refactor(core): simplify style generation logic"
+git commit -m "refactor(utils): extract common helper functions"
+
+# Test commits
+git commit -m "test(unit): add tests for CSS parser"
+git commit -m "test(integration): add build process tests"
+
+# Chore commits
+git commit -m "chore(deps): update postcss to v8.5.0"
+git commit -m "chore(ci): improve GitHub Actions workflow"
+```
+
+**Commit message structure:**
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Example with body:**
+
+```
+feat(css): add responsive grid system
+
+Implements a 12-column grid system with breakpoints for
+mobile, tablet, and desktop layouts. Includes utility
+classes for column spans and offsets.
+
+Closes #123
+```
+
+#### Version Detection Logic
+
+The automated system determines version bumps in this order:
+
+1. **Branch name** (primary detection)
+   - `feat/` or `feature/` → MINOR
+   - `break/` or `breaking/` → MAJOR
+   - Everything else → PATCH
+
+2. **PR title** (secondary detection)
+   - `feat:` → MINOR
+   - `break:` or `breaking:` → MAJOR
+   - `!` suffix → MAJOR (e.g., `feat!:`)
+   - Everything else → PATCH
+
+#### Complete Workflow Examples
+
+**Example 1: Adding a new CSS utility (MINOR version)**
 
 ```sh
+# 1. Create feature branch
 git checkout -b feat/spacing-utilities
-# Make your changes in your fork
+
+# 2. Make your changes
+# ... edit files ...
+
+# 3. Commit with conventional format
 git commit -m "feat(css): add margin and padding utility classes"
-# Create PR with title: "feat(css): add spacing utility classes"
-# Result: MINOR version bump (e.g., 1.0.0 → 1.1.0)
+git commit -m "docs(css): document new spacing utilities"
+
+# 4. Push to your fork
+git push origin feat/spacing-utilities
+
+# 5. Create PR with title: "feat(css): add spacing utility classes"
+# Result after merge: MINOR bump (1.3.2 → 1.4.0)
 ```
 
-**Fixing a styling bug:**
+**Example 2: Fixing a bug (PATCH version)**
 
 ```sh
+# 1. Create fix branch
 git checkout -b fix/button-hover-state
-# Make your changes in your fork
+
+# 2. Fix the issue
+# ... edit files ...
+
+# 3. Commit the fix
 git commit -m "fix(button): resolve hover state color inconsistency"
-# Create PR with title: "fix(button): resolve hover state styling issue"
-# Result: PATCH version bump (e.g., 1.0.0 → 1.0.1)
+git commit -m "test(button): add test for hover state"
+
+# 4. Push to your fork
+git push origin fix/button-hover-state
+
+# 5. Create PR with title: "fix(button): resolve hover state styling issue"
+# Result after merge: PATCH bump (1.3.2 → 1.3.3)
 ```
 
-**Breaking API changes:**
+**Example 3: Breaking changes (MAJOR version)**
 
 ```sh
+# 1. Create breaking change branch
 git checkout -b break/css-vars-restructure
-# Make your changes in your fork
-git commit -m "feat!: restructure CSS custom properties for better naming convention"
-# Create PR with title: "feat!: restructure CSS custom properties"
-# PR description: "BREAKING CHANGE: CSS variables have been renamed for better consistency..."
-# Result: MAJOR version bump (e.g., 1.0.0 → 2.0.0)
+
+# 2. Make breaking changes
+# ... edit files ...
+
+# 3. Commit with breaking change indicator
+git commit -m "feat!: restructure CSS custom properties"
+git commit -m "docs: add migration guide for v2.0.0"
+
+# 4. Push to your fork
+git push origin break/css-vars-restructure
+
+# 5. Create PR with title: "feat!: restructure CSS custom properties"
+# PR description should include:
+# "BREAKING CHANGE: CSS variables have been renamed for better consistency.
+# See migration guide for details."
+# Result after merge: MAJOR bump (1.3.2 → 2.0.0)
+```
+
+#### PR Validation Checks
+
+When you open a PR, automated checks will validate:
+
+✅ **Branch Naming** - Must follow `type/description` pattern
+✅ **PR Title** - Must follow conventional commits format
+✅ **Title Length** - Should be ≤ 72 characters (warning if longer)
+✅ **TypeScript** - Type checking must pass
+✅ **Tests** - All tests must pass
+✅ **Code Quality** - No `console.log` in production code
+✅ **TODOs** - Must reference GitHub issues (e.g., `// TODO: #123`)
+✅ **Documentation** - New features should update docs
+
+**The PR validation bot will comment with:**
+
+- ✅ Pass/Fail status for each check
+- 📦 Expected version bump type
+- ⚠️ Warnings (non-blocking issues)
+- ❌ Blocking issues that must be fixed
+
+**Example validation report:**
+
+```
+🔍 PR Validation Report
+
+Status: ✅ PASSED
+Branch: feat/grid-system
+Expected Version Bump: minor
+
+✅ Validation Results
+| Check           | Status  | Description                    |
+|-----------------|---------|--------------------------------|
+| Branch Naming   | ✅ Pass | Must follow type/description   |
+| PR Title        | ✅ Pass | Must follow conventional commits|
+| TypeScript      | ✅ Pass | Type checking validation       |
+| Tests           | ✅ Pass | All tests must pass            |
+| Code Quality    | ✅ Pass | No console.log, TODOs need issues|
+
+🎯 Next Steps
+This PR is ready for review - all validation checks passed!
+
+📝 Automatic Release
+When your PR is merged:
+- Version will be bumped (minor)
+- CHANGELOG will be updated automatically
+- Package will be published to NPM
+- You'll get a comment with the published version
+
+No manual changeset needed - it's all automatic! 🚀
 ```
 
 ### Important Notes for Contributors
