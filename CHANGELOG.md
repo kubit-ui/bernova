@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1
+
+### Patch Changes
+
+- Modify changelog showing links
+
 ## 1.4.0
 
 ### Minor Changes
