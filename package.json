@@ -52,7 +52,11 @@
     "test:coverage": "vitest run --coverage",
     "test:ci": "vitest --coverage.enabled=true --silent --run ",
     "clean": "rm -rf dist types",
-    "postinstall": "echo 'postinstall'"
+    "postinstall": "echo 'postinstall'",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "changeset:status": "changeset status --verbose"
   },
   "keywords": [
     "css",
@@ -113,6 +117,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
+    "@changesets/cli": "^2.29.8",
     "@vitejs/plugin-legacy": "^6.1.1",
     "@vitest/coverage-v8": "3.2.4",
     "@vitest/ui": "^3.2.4",

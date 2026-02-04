@@ -2,164 +2,127 @@
 
 All notable changes to Bernova will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format uses [Changesets](https://github.com/changesets/changesets) for automated version management and changelog generation.
 
-## [1.3.2] - 2926-01-28
+## 1.3.2
 
-### Patch
+### Patch Changes
 
-- **Fixed js modules compability**: Fixed the compability when the js modules are transpiled with ts-node
-- **Deleted multiple ora instances**: Delete the multiple ora instances to prevent failures
+- Fixed js modules compability when transpiled with ts-node
+- Deleted multiple ora instances to prevent failures
 
-## [1.3.1] - 2026-01-21
+## 1.3.1
 
-### Patch
+### Patch Changes
 
-- **prevent minify provider**: Prevent minify providerTemplate.js file
+- Prevent minify providerTemplate.js file
 
-## [1.3.0] - 2026-01-21
+## 1.3.0
 
-### New Features
+### Minor Changes
 
-- **Added --embed-css flag**: Added the function for embedded styles.
+- Added --embed-css flag for embedded styles functionality
 
-## [1.2.2] - 2026-01-16
+## 1.2.2
 
-### Fixed
+### Patch Changes
 
-- **Fixed the css generated into js modules folder**: Prevent the copy of the css into js modules folders
-- **Fixed the css minified name**: Fixed the minified css name
+- Fixed the css generated into js modules folder
+- Fixed the css minified name
 
-## [1.2.1] - 2026-01-15
+## 1.2.1
 
-### Fixed
+### Patch Changes
 
-- **Fixed the dependencies**: Fixed the package.json dependencies types
-- **Fixed the css custom output dir**: Fixed the custom css output dir
+- Fixed the package.json dependencies types
+- Fixed the css custom output dir
 
-## [1.2.0] - 2026-01-14
+## 1.2.0
 
-### New Features
+### Minor Changes
 
-- **Added new bv-build cli flags**: Added flags to overwrite baseOutDir, rootDir, preventMoveJS, preventMoveDTS and set preventProcessJS
+- Added new bv-build cli flags: baseOutDir, rootDir, preventMoveJS, preventMoveDTS and preventProcessJS
 
-### Fixed
+### Patch Changes
 
-- **Prevent minify declaration files**: Prevent minify with terser the typescript declaration files
+- Prevent minify declaration files with terser
 
-### Documentation
+## 1.1.0
 
-- **Added the new flags documentation**: Added the documentation about the new flags cases
+### Minor Changes
 
-## [1.1.0] - 2026-01-13
+- Added cli bv-build flags to overwrite css, tools and provider customOutDirs
 
-### New Features
+### Patch Changes
 
-- **Added cli bv-build flags**: Added flags to overwrite css, tools and provider customOutDirs
+- Prevent transpile declaration files
 
-### Documentation
+## 1.0.1
 
-- **Added documentation for cli flags**: Added documentation about the flags uses cases
+### Patch Changes
 
-### Fixed
+- Semantic problem solved: change target for targets
+- Added the bernova build script example
+- Added the instalation examples with npm and yarn
 
-- **Prevent transpile declaration files**: Added logic to prevent process typescript declaration files
+## 1.0.0
 
-## [1.0.1] - 2026-01-12
+### Major Changes
 
-### Fixed
+- **Initial stable release** - Production ready CSS-in-JS framework
 
-- **Semantic problem solved**: change target for targets
+### Minor Changes
 
-### Documentatation
+- Improve library styles and tools build/dist
+- Improve provider router handler for relative doc routes
 
-- **Added the bernova build script example**: Added the bv-build example.
-- **Added the instalation examples with anothers packages manager**: Added examples for `'npm'` and `'yarn`
+### Patch Changes
 
-## [1.0.0] - 2026-01-08
+- Fixed the doc routes: Change absolute routes for relative routes
+- Fixed Error in partial transpilation for --foundationsOnly and --componentsOnly flags
 
-### New Features
+## 0.3.0
 
-- **Improve library styles and tools build/dist**: Complete the buildStyle.js cli function.
-- **Improve provider router hanler**: Improve the Bernova provider for handler relative doc routes.
-
-### Fixed
-
-- **Fixed the doc routes**: Change the absolute routes for relative routes into provides's stats.
-- **Fixed Error in partial transpilation**: Fixed the function for the flags --foundationsOnly and --componentsOnly.
-
-## [0.3.0] - 2026-01-01
-
-### ✨ New Features
+### Minor Changes
 
 - **Modern Build System**: Migrated to Vite 7 with TypeScript configuration for improved build performance
 - **Dual Package Support**: Added ESM (`.mjs`) and CommonJS (`.cjs`) support for better compatibility across different module systems
-- **Custom Build Plugins**: Implemented 4 specialized Vite plugins:
-  - `copyCSSPlugin`: Minifies and copies CSS files
-  - `copyCLIBinariesPlugin`: Preserves CLI executables with proper shebangs
-  - `copySourcePlugin`: Minifies source files with aggressive optimization
-  - `removeTestFilesPlugin`: Ensures test files are excluded from distribution
-
-### 🚀 Performance Improvements
-
+- **Custom Build Plugins**: Implemented 4 specialized Vite plugins (copyCSSPlugin, copyCLIBinariesPlugin, copySourcePlugin, removeTestFilesPlugin)
 - **Ultra-optimized Bundle**: Reduced package size from 56.4 KB to 41.4 KB (27% reduction)
 - **Aggressive Minification**: Implemented Terser with 3-pass optimization removing all comments
 - **Tree-shaking**: Enhanced dead code elimination for smaller bundles
-- **Zero JSDoc in Distribution**: Removed all TSDoc comments as they're unnecessary for CLI tools
 
-### 📚 Documentation
+### Patch Changes
 
-- **Professional README**: Added comprehensive badges (npm version, downloads, license, coverage, PRs welcome)
-- **Package Distribution**: Created `.npmignore` to exclude unnecessary files from npm package
-- **Modern Package Exports**: Updated `package.json` with conditional exports for better module resolution
+- Professional README with comprehensive badges
+- Created `.npmignore` to exclude unnecessary files from npm package
+- Updated `package.json` with conditional exports for better module resolution
+- Separated development and production TypeScript configs (`tsconfig.build.json`)
+- Enhanced CI/CD with proper build verification steps
 
-### 🔧 Infrastructure
+## 0.1.2
 
-- **TypeScript Build Configuration**: Separated development and production TypeScript configs (`tsconfig.build.json`)
-- **Node.js Compatibility**: Maintained Node.js >=20.0.0 target with ES2020 output
-- **Build Validation**: Enhanced CI/CD with proper build verification steps
+### Patch Changes
 
-## [0.1.2] - 2025-10-28
-
-### 🔧 Changed
-
-- **License update**: Changed project license from ISC to Apache-2.0 for better open source compliance
-- **Package management**: Improved gitignore configuration to exclude package-lock.json for better npm/yarn compatibility
-
-### 🗑️ Removed
-
+- Changed project license from ISC to Apache-2.0 for better open source compliance
+- Improved gitignore configuration to exclude package-lock.json
 - Removed package-lock.json file from version control to avoid package manager conflicts
 
-## [0.1.1] - 2025-10-22
+## 0.1.1
 
-### 🐛 Fixed
+### Patch Changes
 
-- **Build system**: Resolved NPM versioning and authentication issues
-- **Package metadata**: Improved package.json with complete metadata for open source distribution
-- **Workflow automation**: Fixed auto-publish workflow build validation and authentication verification
+- Resolved NPM versioning and authentication issues
+- Improved package.json with complete metadata for open source distribution
+- Fixed auto-publish workflow build validation and authentication verification
+- Updated minimum Node.js version requirements
+- Enhanced build process for better distribution
 
-### 🔧 Changed
+## 0.1.0
 
-- **Node.js compatibility**: Updated minimum Node.js version requirements
-- **Build optimization**: Enhanced build process for better distribution
+### Minor Changes
 
-## [0.1.0] - 2025-10-21
-
-All notable changes to Bernova will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [0.1.2] - 2025-10-28
-
-## [0.1.1] - 2025-10-21
-
-## [0.1.0] - 2025-10-21
-
-### 🎉 Initial Release
-
-Bernova is a powerful CSS-in-JS framework that allows you to write CSS with JavaScript syntax, providing a comprehensive solution for modern web styling.
+- **Initial Release** - Bernova CSS-in-JS framework
 
 ### ✨ Core Features
 

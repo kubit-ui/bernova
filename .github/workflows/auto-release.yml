@@ -1,0 +1,237 @@
+name: Auto Release with Changesets
+
+# This workflow automatically creates changesets and publishes on merge to main
+# It combines the automation of the old system with Changesets' changelog generation
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+  id-token: write
+
+jobs:
+  auto-release:
+    name: Auto Release
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "kubit-bot@github.com"
+          git config --local user.name "Kubit Release Bot"
+
+      - name: Detect version bump type
+        id: detect-version
+        run: |
+          BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          echo "Branch: $BRANCH_NAME"
+          echo "PR Title: $PR_TITLE"
+
+          # Detect from branch name
+          if [[ "$BRANCH_NAME" =~ ^(break|breaking)/ ]] || [[ "$PR_TITLE" =~ ^(break|breaking): ]]; then
+            VERSION_TYPE="major"
+          elif [[ "$BRANCH_NAME" =~ ^(feat|feature)/ ]] || [[ "$PR_TITLE" =~ ^feat: ]]; then
+            VERSION_TYPE="minor"
+          else
+            VERSION_TYPE="patch"
+          fi
+
+          echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
+          echo "✅ Detected version bump: $VERSION_TYPE"
+
+      - name: Check for existing changesets
+        id: check-changesets
+        run: |
+          # Check if PR already has changesets
+          CHANGESET_FILES=$(git diff --name-only origin/main...HEAD | grep '^.changeset/.*\.md$' | grep -v 'README.md' || true)
+
+          if [ -n "$CHANGESET_FILES" ]; then
+            echo "has_changeset=true" >> $GITHUB_OUTPUT
+            echo "✅ PR already has changeset(s)"
+          else
+            echo "has_changeset=false" >> $GITHUB_OUTPUT
+            echo "⚠️ No changeset found, will create automatically"
+          fi
+
+      - name: Auto-generate changeset
+        if: steps.check-changesets.outputs.has_changeset == 'false'
+        run: |
+          VERSION_TYPE="${{ steps.detect-version.outputs.version_type }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          # Clean up PR title - remove conventional commit prefix for cleaner changelog
+          CLEAN_TITLE=$(echo "$PR_TITLE" | sed -E 's/^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|break|breaking)(\(.+?\))?:\s*//i')
+
+          # Extract first line of PR body as description (if exists)
+          DESCRIPTION=$(echo "$PR_BODY" | head -n 1 | sed 's/^[#*-]\s*//')
+
+          # Create changeset content with better formatting
+          cat > .changeset/auto-pr-${PR_NUMBER}.md << EOF
+          ---
+          "bernova": ${VERSION_TYPE}
+          ---
+
+          ${CLEAN_TITLE}
+          EOF
+
+          # Add description if it's meaningful (not empty, not a template marker)
+          if [ -n "$DESCRIPTION" ] && [ "$DESCRIPTION" != "## Description" ] && [ "$DESCRIPTION" != "Description" ]; then
+            echo "" >> .changeset/auto-pr-${PR_NUMBER}.md
+            echo "$DESCRIPTION" >> .changeset/auto-pr-${PR_NUMBER}.md
+          fi
+
+          echo "✅ Auto-generated changeset for PR #${PR_NUMBER}"
+          cat .changeset/auto-pr-${PR_NUMBER}.md
+
+      - name: Commit auto-generated changeset
+        if: steps.check-changesets.outputs.has_changeset == 'false'
+        run: |
+          git add .changeset/
+          git commit -m "chore: auto-generate changeset for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
+          git push origin main
+
+      - name: Version packages
+        run: |
+          echo "📦 Updating version and changelog..."
+          pnpm changeset version
+
+          # Check if there are changes
+          if git diff --quiet; then
+            echo "No version changes needed"
+            echo "should_publish=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+          fi
+        id: version
+
+      - name: Commit version changes
+        if: steps.version.outputs.should_publish == 'true'
+        run: |
+          git add .
+          git commit -m "chore(release): version packages [skip ci]"
+          git push origin main
+
+      - name: Build package
+        if: steps.version.outputs.should_publish == 'true'
+        run: pnpm run build
+
+      - name: Publish to NPM
+        if: steps.version.outputs.should_publish == 'true'
+        run: |
+          echo "🚀 Publishing to NPM..."
+          pnpm changeset publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Get published version
+        if: steps.version.outputs.should_publish == 'true'
+        id: get-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Published version: $VERSION"
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.should_publish == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.get-version.outputs.version }}';
+            const fs = require('fs');
+
+            // Read CHANGELOG to get release notes
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+            const versionSection = changelog.split(`## [${version}]`)[1]?.split('##')[0] || 'See CHANGELOG.md for details';
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${version}`,
+              name: `v${version}`,
+              body: `## 📦 Release v${version}\n\n${versionSection}\n\n### 📥 Installation\n\n\`\`\`bash\nnpm install bernova@${version}\n# or\npnpm add bernova@${version}\n# or\nyarn add bernova@${version}\n\`\`\`\n\n### 🔗 Links\n- [NPM Package](https://www.npmjs.com/package/bernova/v/${version})\n- [Changelog](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
+              draft: false,
+              prerelease: false
+            });
+
+      - name: Comment on PR
+        if: steps.version.outputs.should_publish == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.get-version.outputs.version }}';
+            const versionType = '${{ steps.detect-version.outputs.version_type }}';
+
+            const message = `## 🚀 Published to NPM!
+
+            **bernova@${version}** has been successfully published.
+
+            ### 📦 Version Bump
+            - Type: **${versionType}**
+            - Version: **${version}**
+
+            ### 📥 Installation
+            \`\`\`bash
+            npm install bernova@${version}
+            # or
+            pnpm add bernova@${version}
+            # or
+            yarn add bernova@${version}
+            \`\`\`
+
+            ### 🔗 Links
+            - [NPM Package](https://www.npmjs.com/package/bernova/v/${version})
+            - [GitHub Release](https://github.com/${{ github.repository }}/releases/tag/v${version})
+            - [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+
+            🎉 **Ready to use!**`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
