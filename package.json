@@ -9,6 +9,9 @@
       "types": "./dist/src/index.d.ts",
       "require": "./dist/src/index.js",
       "default": "./dist/src/index.js"
+    },
+    "./interfaces": {
+      "types": "./dist/interfaces/componentsType.ts"
     }
   },
   "bin": {
@@ -32,7 +35,8 @@
     "build": "pnpm run clean && pnpm run build:types && pnpm run build:vite && pnpm run build:copy",
     "build:vite": "vite build",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir types",
-    "build:copy": "pnpm run build:copy-src && pnpm run build:copy-bin && pnpm run build:optimize",
+    "build:copy-interfaces": "cp -r interfaces dist/interfaces && echo 'bernova components interfaces copied'",
+    "build:copy": "pnpm run build:copy-src && pnpm run build:copy-interfaces && pnpm run build:copy-bin && pnpm run build:optimize",
     "build:copy-src": "cp -r src dist/ && echo 'Source files copied for compatibility'",
     "build:copy-bin": "mkdir -p dist/bin && cp -r bin/* dist/bin/ && chmod +x dist/bin/*.js && echo 'CLI binaries copied and made executable'",
     "build:optimize": "pnpm run build:remove-tests && pnpm run build:remove-docs && pnpm run build:minify-cli",

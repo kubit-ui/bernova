@@ -30,14 +30,12 @@ const generateCssDoc = ({
   const createComponents = compilerType !== compilerTypeValid.foundationOnly;
 
   // Generate foundations section (CSS variables, reset, base styles)
-  const foundations = createFoundations
-    ? `/* === BERNOVA FOUNDATIONS === */\n${foundationsCss}/* === END FOUNDATIONS === */\n\n`
-    : oldData;
+  const crrFoundation = createFoundations ? foundationsCss : oldData;
+  const foundations = `/* === BERNOVA FOUNDATIONS === */\n${crrFoundation.trim()}/* === END FOUNDATIONS === */\n`
 
   // Generate components section (component styles, utilities, media queries)
-  const components = createComponents
-    ? `/* === BERNOVA COMPONENTS === */\n${stylesCss}/* === END COMPONENTS === */\n`
-    : oldData;
+  const crrComponents = createComponents ? stylesCss : oldData;
+  const components = `/* === BERNOVA COMPONENTS === */\n${crrComponents.trim()}/* === END COMPONENTS === */\n`
 
   // Combine sections into final CSS document
   const cssDocument = `${foundations}${components}`;

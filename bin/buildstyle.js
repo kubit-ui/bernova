@@ -84,7 +84,7 @@ const {
   //* Get CSS files to process
   const cssFiles = getCssFiles({ themes, minifyCss });
   //* Get js files to process
-  const jsFiles = !preventProcessJs ? getJsFiles({ provider, themes, preventMoveDTS }) : [];
+  const jsFiles = !preventProcessJs ? await getJsFiles({ dir, provider, themes, preventMoveDTS }) : [];
   //* Write files
   const baseOutPath = getBaseOutDir({ baseOutDir });
   if (cssFiles && cssFiles.length > 0 && !embedCss) {
@@ -172,16 +172,12 @@ async function writeJs({
   }
   let jsDocFile = await fs.readFile(currentJsDir, 'utf8');
   const processStatsFile = !!customOutDirs?.css || (embedCss && cssFiles.length > 0);
-  if (jsFile.name === 'stats.js' && processStatsFile) {
-    const match = extractDocFragment({
-      section: 'CssThemes',
-      doc: jsDocFile
-    });
-    const block = match.replace(/export const cssThemes\s*=\s*/, '');
+  if (jsFile.name === 'cssTheme.js' && processStatsFile) {
+    const block = jsDocFile.replace('export default', '');
     const cssThemes = new Function(`return (${block})`)();
     if (customOutDirs?.css) {
       const blockModified = modifyThemesPath({ cssThemes, cssOutPath: customOutDirs.css });
-      jsDocFile = jsDocFile.replace(match, `export const cssThemes = {\n${blockModified}};\n`);
+      jsDocFile = `export default {\n${blockModified}};\n`;
     } else if (embedCss && cssFiles.length > 0) {
       const foreignContent = {};
       const themesContent = await cssFiles.reduce(async (acc, { name: cssFileName, path: cssFilePath, parent: cssParent }) => {
@@ -212,8 +208,7 @@ async function writeJs({
         bacc += `'${themeName}': { css: \`${fullCssContent}\` },\n`;
         return bacc;
       }, '');
-      const blockModified = `export const cssThemes = {\n${valuesModified}};\n`;
-      jsDocFile = jsDocFile.replace(match, blockModified);
+      jsDocFile = `export default {\n${valuesModified}};\n`;
     }
   }
   if (jsFile.name === `${provider.name.toLocaleLowerCase()}.js` && processStatsFile) {
@@ -295,7 +290,7 @@ async function writeCss({
   customOutDirs,
   dir,
 }){
-  for(const cssFile of cssFiles) {
+  for (const cssFile of cssFiles) {
     const adaptedOutDir = (() => {
       if (rootDir && !customOutDirs?.css) {
         return path.relative(rootDir, cssFile.path);
@@ -303,7 +298,7 @@ async function writeCss({
         return customOutDirs.css;
       }
       return cssFile.path;
-    })()
+    })();
     const currentCssDir = path.resolve(dir, cssFile.path, cssFile.name);
     if (fileExists(dir, currentCssDir)) {
       const cssDocFile = await fs.readFile(currentCssDir, 'utf8');
@@ -343,7 +338,7 @@ function getBaseOutDir({ baseOutDir, type = '-' }) {
  * @param {boolean} commonjs
  * @returns {Promise<string>}
  */
-async function transpileTo(code, filename, commonjs = false){
+async function transpileTo(code, filename, commonjs = false) {
   const modules = commonjs ? 'commonjs' : false;
   const result = await babel.transformAsync(code, {
     filename,
@@ -354,9 +349,9 @@ async function transpileTo(code, filename, commonjs = false){
           modules,
           targets: {
             node: 'current',
-          }
-        }
-      ]
+          },
+        },
+      ],
     ],
   });
   return result.code;
@@ -429,12 +424,13 @@ function getCssFiles({ themes, minifyCss }) {
 /**
  * Get JavaScript file to process
  * @param {object} params
+ * @param {string} params.dir 
  * @param {{ name: string, path: string, declarationHelp?: boolean }} params.provider
  * @param {Array<{ name: string, path: string, bvTools: object }>} params.themes
  * @param {boolean} params.preventMoveDTS
- * @returns {Array<{ name: string, path: string }>}
+ * @returns {Promise<Array<{ name: string, path: string }>>}
  */
-function getJsFiles({ provider, themes, preventMoveDTS = false }) {
+async function getJsFiles({ dir, provider, themes, preventMoveDTS = false }) {
   const jsFiles = themes && themes.bvTools
     ? themes.reduce((acc, { bvTools }) => {
       //* destructure bvTools
@@ -455,7 +451,7 @@ function getJsFiles({ provider, themes, preventMoveDTS = false }) {
         cssClassNames,
         cssMediaQueries,
         cssGlobalStyles,
-        availableComponents
+        availableComponents,
       } = bvTools;
       const hasDeclarationFile = declarationHelp && !preventMoveDTS;
       //* Get cssVars file
@@ -471,7 +467,7 @@ function getJsFiles({ provider, themes, preventMoveDTS = false }) {
         const cssClassNamesName = 'cssClasses.js';
         pushUniqueFile(acc, { name: cssClassNamesName, path: toolPath });
         if (hasDeclarationFile) {
-          const cssClassNamesDtsName = 'cssClasses.d.ts'
+          const cssClassNamesDtsName = 'cssClasses.d.ts';
           pushUniqueFile(acc, { name: cssClassNamesDtsName, path: toolPath });
         }
       }
@@ -507,8 +503,23 @@ function getJsFiles({ provider, themes, preventMoveDTS = false }) {
     const providerFileName = `${provider.name.toLocaleLowerCase()}.js`;
     pushUniqueFile(jsFiles, { name: providerFileName, path: provider.path });
     //* stats file
+    const statsFilePath = path.join(provider.path, 'stats');
     const statsFileName = 'stats.js';
-    pushUniqueFile(jsFiles, { name: statsFileName, path: `${provider.path}/stats` });
+    pushUniqueFile(jsFiles, { name: statsFileName, path: statsFilePath });
+    //* stats data
+    const stResolve = path.resolve(dir, statsFilePath);
+    const entries = await fs.readdir(stResolve, { withFileTypes: true });
+    entries.forEach((entry) => {
+      if (entry.isDirectory()) {
+        const registerPath = path.join(statsFilePath, entry.name);
+        pushUniqueFile(jsFiles, { name: 'cssAvailableComponents.js', path: registerPath });
+        pushUniqueFile(jsFiles, { name: 'cssClassNames.js', path: registerPath });
+        pushUniqueFile(jsFiles, { name: 'cssGlobalStyles.js', path: registerPath });
+        pushUniqueFile(jsFiles, { name: 'cssMediaQueries.js', path: registerPath });
+        pushUniqueFile(jsFiles, { name: 'cssTheme.js', path: registerPath });
+        pushUniqueFile(jsFiles, { name: 'cssVars.js', path: registerPath });
+      }
+    })
     //* declaration files
     if (provider.declarationHelp && !preventMoveDTS) {
       //* provider declaration file
@@ -517,6 +528,17 @@ function getJsFiles({ provider, themes, preventMoveDTS = false }) {
       //* stats declaration file
       const statsDtsFileName = 'stats.d.ts';
       pushUniqueFile(jsFiles, { name: statsDtsFileName, path: `${provider.path}/stats` });
+      entries.forEach((entry) => {
+        if (entry.isDirectory()) {
+          const registerPath = path.join(statsFilePath, entry.name);
+          pushUniqueFile(jsFiles, { name: 'cssAvailableComponents.d.ts', path: registerPath });
+          pushUniqueFile(jsFiles, { name: 'cssClassNames.d.ts', path: registerPath });
+          pushUniqueFile(jsFiles, { name: 'cssGlobalStyles.d.ts', path: registerPath });
+          pushUniqueFile(jsFiles, { name: 'cssMediaQueries.d.ts', path: registerPath });
+          pushUniqueFile(jsFiles, { name: 'cssTheme.d.ts', path: registerPath });
+          pushUniqueFile(jsFiles, { name: 'cssVars.d.ts', path: registerPath });
+        }
+      })
     }
   }
   return jsFiles;
@@ -583,7 +605,7 @@ function getBernovaBuildArgs() {
     '--css',
     '--tools',
     '--provider',
-    '--embed-css'
+    '--embed-css',
   ];
   const args = {};
   for (let i = 0; i < process.argv.length; i++) {
@@ -597,7 +619,7 @@ function getBernovaBuildArgs() {
           return '';
         }
         return value;
-      })()
+      })();
     }
   }
   return args;
@@ -612,10 +634,10 @@ function getBernovaBuildArgs() {
 function overwriteCustomOutDirs({ jsonCustomOutDirs, cliCustomOutDirs }) {
   let mergeOutDirs = {};
   if (jsonCustomOutDirs) {
-    mergeOutDirs = { ...jsonCustomOutDirs }
+    mergeOutDirs = { ...jsonCustomOutDirs };
   }
   if (cliCustomOutDirs) {
-    mergeOutDirs = { ...mergeOutDirs, ...cliCustomOutDirs }
+    mergeOutDirs = { ...mergeOutDirs, ...cliCustomOutDirs };
   }
   return Object.keys(mergeOutDirs).length > 0 ? mergeOutDirs : undefined;
 }

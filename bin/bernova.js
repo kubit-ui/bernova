@@ -9,8 +9,8 @@
  * Usage:
  *   bernova                    # Compile all (foundation + components)
  *   bernova --full             # Compile all (foundation + components)
- *   bernova --foundationOnly   # Compile only CSS variables and base styles
- *   bernova --componentOnly    # Compile only component classes and utilities
+ *   bernova --foundation-only   # Compile only CSS variables and base styles
+ *   bernova --component-only    # Compile only component classes and utilities
  */
 
 const { bernovaStyles } = require('../src/app.js');
