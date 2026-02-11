@@ -156,13 +156,13 @@ By adding a flag at the end of the script, you can transpile only part of the pr
 For FOUNDATIONS, MediaQueries, and GlobalStyles:
 
 ```bash
-npx bernova --foundationOnly
+npx bernova --foundation-only
 ```
 
 For the classes of the HTML elements and available components
 
 ```bash
-npx bernova --componentOnly
+npx bernova --component-only
 ```
 
 ## Design Tools

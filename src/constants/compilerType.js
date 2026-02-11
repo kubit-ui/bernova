@@ -4,9 +4,9 @@
  */
 const compilerTypeValid = {
   /** Generate only foundation styles (CSS variables, base styles, reset CSS) */
-  foundationOnly: 'foundationOnly',
+  foundationOnly: 'foundation-only',
   /** Generate only component/theme styles (classes, utilities, media queries) */
-  componentOnly: 'componentOnly',
+  componentOnly: 'component-only',
   /** Generate both foundation and component styles (complete build) */
   full: 'full',
 };
