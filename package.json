@@ -9,6 +9,9 @@
       "types": "./dist/src/index.d.ts",
       "require": "./dist/src/index.js",
       "default": "./dist/src/index.js"
+    },
+    "./interfaces": {
+      "types": "./dist/interfaces/componentsType.ts"
     }
   },
   "bin": {
