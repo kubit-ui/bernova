@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.2
+
+### Patch Changes
+
+- Fixed the const name
+
+  Pull Request
+
 ## 1.5.1
 
 ### Patch Changes
