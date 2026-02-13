@@ -84,7 +84,7 @@ const {
   //* Get CSS files to process
   const cssFiles = getCssFiles({ themes, minifyCss });
   //* Get js files to process
-  const jsFiles = !preventProcessJs ? await getJsFiles({ dir, provider, themes, preventMoveDTS }) : [];
+  const jsFiles = !preventProcessJs ? await getJsFiles({ dir, customOutDirs, provider, themes, preventMoveDTS }) : [];
   //* Write files
   const baseOutPath = getBaseOutDir({ baseOutDir });
   if (cssFiles && cssFiles.length > 0 && !embedCss) {
@@ -173,45 +173,41 @@ async function writeJs({
   let jsDocFile = await fs.readFile(currentJsDir, 'utf8');
   const processStatsFile = !!customOutDirs?.css || (embedCss && cssFiles.length > 0);
   if (jsFile.name === 'cssTheme.js' && processStatsFile) {
-    const block = jsDocFile.replace('export default', '');
+    const block = jsDocFile.replace('export default', '').replaceAll(';', '').trim();
     const cssThemes = new Function(`return (${block})`)();
     if (customOutDirs?.css) {
       const blockModified = modifyThemesPath({ cssThemes, cssOutPath: customOutDirs.css });
       jsDocFile = `export default {\n${blockModified}};\n`;
     } else if (embedCss && cssFiles.length > 0) {
-      const foreignContent = {};
-      const themesContent = await cssFiles.reduce(async (acc, { name: cssFileName, path: cssFilePath, parent: cssParent }) => {
-        const currentCssFilePath = path.resolve(dir, cssFilePath, cssFileName);
-        if (fileExists(dir, currentCssFilePath)) {
-          const cssFileContent = await fs.readFile(currentCssFilePath, 'utf8');
-          if (cssParent) {
-            cssParent.forEach((p) => {
-              const { name: parentName, position } = p;
-              if (!(parentName in foreignContent)) {
-                foreignContent[parentName] = { before: '', after: '' };
+      const crrCssFileName = Object.keys(cssThemes)[0];
+      const crrCssFile = cssFiles.find((f) => f.name === `${crrCssFileName}.css` || f.name === `${crrCssFileName}.min.css`);
+      if (crrCssFile) {
+        const { name: cssFileName, path: cssFilePath } = crrCssFile;
+        const crrCssFilePath = path.resolve(dir, cssFilePath, cssFileName);
+        const cssFileContent = fileExists(dir, crrCssFileName)
+          ? (await fs.readFile(crrCssFilePath, 'utf8')).replace(/\s+/g, '')
+          : '';
+        const foreignCss = { before: '', after: '' };
+        for (const cssFile of cssFiles) {
+          const { name: foreignName, path: foreignPath, parent: foreignParent } = cssFile;
+          if (foreignParent) {
+            for (const { name: parentName, position: docPosition } of foreignParent) {
+              if (parentName === crrCssFileName) {
+                const fFilePath = path.resolve(dir, foreignPath, foreignName);
+                if (fileExists(dir, fFilePath)) {
+                  const fFileContent = (await fs.readFile(fFilePath, 'utf8')).replace(/\s+/g, '');
+                  foreignCss[docPosition] += fFileContent;
+                }
               }
-              foreignContent[parentName][position] += cssFileContent.replace(/\s+/g, '');
-            })
-          } else{
-            const themeName = cssFileName.replace('.css', '').replace('.min', '');
-            if (!(themeName in acc)) {
-              acc[themeName] = '';
             }
-            acc[themeName] += cssFileContent.replace(/\s+/g, '');
           }
         }
-        return acc;
-      }, {});
-      const valuesModified = Object.entries(themesContent).reduce((bacc, [themeName, content]) => {
-        const foreign = foreignContent[themeName] || { before: '', after: '' };
-        const fullCssContent = foreign.before + content + foreign.after;
-        bacc += `'${themeName}': { css: \`${fullCssContent}\` },\n`;
-        return bacc;
-      }, '');
-      jsDocFile = `export default {\n${valuesModified}};\n`;
+        const fullCssContent = foreignCss.before + cssFileContent + foreignCss.after;
+        jsDocFile = `export default {'${crrCssFileName}':{css:\`${fullCssContent}\`}};`;
+      }
     }
   }
-  if (jsFile.name === `${provider.name.toLocaleLowerCase()}.js` && processStatsFile) {
+  if (jsFile.name === `${provider.name.toLocaleLowerCase()}.js` && embedCss && cssFiles.length > 0) {
     const newMethods = /* js */`
     #linkBuilder = (css, id) => {
       if (typeof document === 'undefined') return;
@@ -243,7 +239,7 @@ async function writeJs({
     });
     jsDocFile = providerTemplate.replace(match, newMethods.trim());
   }
-  if (jsFile.name === `${provider.name.toLocaleLowerCase()}.d.ts` && processStatsFile) {
+  if (jsFile.name === `${provider.name.toLocaleLowerCase()}.d.ts` && embedCss && cssFiles.length > 0) {
     const newMethods = /* ts */`
     #linkBuilder(css: string, id: string): void;
     #handlerThemes(data: { css: string }): void;
@@ -267,7 +263,7 @@ async function writeJs({
   if (minifyJS && !isDeclarationFile) {
     jsDocFile = await minifyJSFile(jsDocFile);
   }
-  const adaptedOutDir = path.relative(rootDir || '', jsFile.path);
+  const adaptedOutDir = path.relative(rootDir || '', jsFile.outPath);
   const finalLocation = preventMoveJS
     ? currentJsDir
     : path.resolve(baseOutPath, adaptedOutDir, jsFile.name);
@@ -289,7 +285,7 @@ async function writeCss({
   rootDir,
   customOutDirs,
   dir,
-}){
+}) {
   for (const cssFile of cssFiles) {
     const adaptedOutDir = (() => {
       if (rootDir && !customOutDirs?.css) {
@@ -425,12 +421,13 @@ function getCssFiles({ themes, minifyCss }) {
  * Get JavaScript file to process
  * @param {object} params
  * @param {string} params.dir 
+ * @param {{ tools: string, provider: string }} param.customOutDirs
  * @param {{ name: string, path: string, declarationHelp?: boolean }} params.provider
  * @param {Array<{ name: string, path: string, bvTools: object }>} params.themes
  * @param {boolean} params.preventMoveDTS
  * @returns {Promise<Array<{ name: string, path: string }>>}
  */
-async function getJsFiles({ dir, provider, themes, preventMoveDTS = false }) {
+async function getJsFiles({ dir, customOutDirs, provider, themes, preventMoveDTS = false }) {
   const jsFiles = themes && themes.bvTools
     ? themes.reduce((acc, { bvTools }) => {
       //* destructure bvTools
@@ -454,45 +451,46 @@ async function getJsFiles({ dir, provider, themes, preventMoveDTS = false }) {
         availableComponents,
       } = bvTools;
       const hasDeclarationFile = declarationHelp && !preventMoveDTS;
+      const outPath = customOutDirs?.tools ? customOutDirs.tools : toolPath;
       //* Get cssVars file
       if (cssVariables) {
         const cssVariablesName = 'cssVars.js';
-        pushUniqueFile(acc, { name: cssVariablesName, path: toolPath });
+        pushUniqueFile(acc, { name: cssVariablesName, path: toolPath, outPath });
         if (hasDeclarationFile) {
           const cssVarsDtsName = 'cssVars.d.ts';
-          pushUniqueFile(acc, { name: cssVarsDtsName, path: toolPath });
+          pushUniqueFile(acc, { name: cssVarsDtsName, path: toolPath, outPath });
         }
       }
       if (cssClassNames) {
         const cssClassNamesName = 'cssClasses.js';
-        pushUniqueFile(acc, { name: cssClassNamesName, path: toolPath });
+        pushUniqueFile(acc, { name: cssClassNamesName, path: toolPath, outPath });
         if (hasDeclarationFile) {
           const cssClassNamesDtsName = 'cssClasses.d.ts';
-          pushUniqueFile(acc, { name: cssClassNamesDtsName, path: toolPath });
+          pushUniqueFile(acc, { name: cssClassNamesDtsName, path: toolPath, outPath });
         }
       }
       if (cssMediaQueries) {
         const cssMediaQueriesName = 'cssMediaQueries.js';
-        pushUniqueFile(acc, { name: cssMediaQueriesName, path: toolPath });
+        pushUniqueFile(acc, { name: cssMediaQueriesName, path: toolPath, outPath });
         if (hasDeclarationFile) {
           const cssMediaQueriesDtsName = 'cssMediaQueries.d.ts';
-          pushUniqueFile(acc, { name: cssMediaQueriesDtsName, path: toolPath });
+          pushUniqueFile(acc, { name: cssMediaQueriesDtsName, path: toolPath, outPath });
         }
       }
       if (cssGlobalStyles) {
         const cssGlobalStylesName = 'cssGlobalStyles.js';
-        pushUniqueFile(acc, { name: cssGlobalStylesName, path: toolPath });
+        pushUniqueFile(acc, { name: cssGlobalStylesName, path: toolPath, outPath });
         if (hasDeclarationFile) {
           const cssGlobalStylesDtsName = 'cssGlobalStyles.d.ts';
-          pushUniqueFile(acc, { name: cssGlobalStylesDtsName, path: toolPath });
+          pushUniqueFile(acc, { name: cssGlobalStylesDtsName, path: toolPath, outPath });
         }
       }
       if (availableComponents) {
         const availableComponentsName = 'cssAvailableComponents.js';
-        pushUniqueFile(acc, { name: availableComponentsName, path: toolPath });
+        pushUniqueFile(acc, { name: availableComponentsName, path: toolPath, outPath });
         if (hasDeclarationFile) {
           const availableComponentsDtsName = 'cssAvailableComponents.d.js';
-          pushUniqueFile(acc, { name: availableComponentsDtsName, path: toolPath });
+          pushUniqueFile(acc, { name: availableComponentsDtsName, path: toolPath, outPath });
         }
       }
       return acc;
@@ -501,42 +499,46 @@ async function getJsFiles({ dir, provider, themes, preventMoveDTS = false }) {
   if (provider) {
     //* provider file
     const providerFileName = `${provider.name.toLocaleLowerCase()}.js`;
-    pushUniqueFile(jsFiles, { name: providerFileName, path: provider.path });
+    const providerOutPath = customOutDirs?.provider ? customOutDirs.provider : provider.path;
+    pushUniqueFile(jsFiles, { name: providerFileName, path: provider.path, outPath: providerOutPath });
     //* stats file
     const statsFilePath = path.join(provider.path, 'stats');
+    const statsOutPath = customOutDirs?.provider ? path.join(customOutDirs.provider, 'stats') : statsFilePath;
     const statsFileName = 'stats.js';
-    pushUniqueFile(jsFiles, { name: statsFileName, path: statsFilePath });
+    pushUniqueFile(jsFiles, { name: statsFileName, path: statsFilePath, outPath: statsOutPath });
     //* stats data
     const stResolve = path.resolve(dir, statsFilePath);
     const entries = await fs.readdir(stResolve, { withFileTypes: true });
     entries.forEach((entry) => {
       if (entry.isDirectory()) {
         const registerPath = path.join(statsFilePath, entry.name);
-        pushUniqueFile(jsFiles, { name: 'cssAvailableComponents.js', path: registerPath });
-        pushUniqueFile(jsFiles, { name: 'cssClassNames.js', path: registerPath });
-        pushUniqueFile(jsFiles, { name: 'cssGlobalStyles.js', path: registerPath });
-        pushUniqueFile(jsFiles, { name: 'cssMediaQueries.js', path: registerPath });
-        pushUniqueFile(jsFiles, { name: 'cssTheme.js', path: registerPath });
-        pushUniqueFile(jsFiles, { name: 'cssVars.js', path: registerPath });
+        const registerOutPath = path.join(statsOutPath, entry.name);
+        pushUniqueFile(jsFiles, { name: 'cssAvailableComponents.js', path: registerPath, outPath: registerOutPath });
+        pushUniqueFile(jsFiles, { name: 'cssClassNames.js', path: registerPath, outPath: registerOutPath });
+        pushUniqueFile(jsFiles, { name: 'cssGlobalStyles.js', path: registerPath, outPath: registerOutPath });
+        pushUniqueFile(jsFiles, { name: 'cssMediaQueries.js', path: registerPath, outPath: registerOutPath });
+        pushUniqueFile(jsFiles, { name: 'cssTheme.js', path: registerPath, outPath: registerOutPath });
+        pushUniqueFile(jsFiles, { name: 'cssVars.js', path: registerPath, outPath: registerOutPath });
       }
     })
     //* declaration files
     if (provider.declarationHelp && !preventMoveDTS) {
       //* provider declaration file
       const providerDtsFileName = `${provider.name.toLocaleLowerCase()}.d.ts`;
-      pushUniqueFile(jsFiles, { name: providerDtsFileName, path: provider.path });
+      pushUniqueFile(jsFiles, { name: providerDtsFileName, path: provider.path, outPath: providerOutPath });
       //* stats declaration file
       const statsDtsFileName = 'stats.d.ts';
-      pushUniqueFile(jsFiles, { name: statsDtsFileName, path: `${provider.path}/stats` });
+      pushUniqueFile(jsFiles, { name: statsDtsFileName, path: statsFilePath, outPath: statsOutPath });
       entries.forEach((entry) => {
         if (entry.isDirectory()) {
           const registerPath = path.join(statsFilePath, entry.name);
-          pushUniqueFile(jsFiles, { name: 'cssAvailableComponents.d.ts', path: registerPath });
-          pushUniqueFile(jsFiles, { name: 'cssClassNames.d.ts', path: registerPath });
-          pushUniqueFile(jsFiles, { name: 'cssGlobalStyles.d.ts', path: registerPath });
-          pushUniqueFile(jsFiles, { name: 'cssMediaQueries.d.ts', path: registerPath });
-          pushUniqueFile(jsFiles, { name: 'cssTheme.d.ts', path: registerPath });
-          pushUniqueFile(jsFiles, { name: 'cssVars.d.ts', path: registerPath });
+          const registerOutPath = path.join(statsOutPath, entry.name);
+          pushUniqueFile(jsFiles, { name: 'cssAvailableComponents.d.ts', path: registerPath, outPath: registerOutPath });
+          pushUniqueFile(jsFiles, { name: 'cssClassNames.d.ts', path: registerPath, outPath: registerOutPath });
+          pushUniqueFile(jsFiles, { name: 'cssGlobalStyles.d.ts', path: registerPath, outPath: registerOutPath });
+          pushUniqueFile(jsFiles, { name: 'cssMediaQueries.d.ts', path: registerPath, outPath: registerOutPath });
+          pushUniqueFile(jsFiles, { name: 'cssTheme.d.ts', path: registerPath, outPath: registerOutPath });
+          pushUniqueFile(jsFiles, { name: 'cssVars.d.ts', path: registerPath, outPath: registerOutPath });
         }
       })
     }
@@ -574,7 +576,7 @@ function modifyThemesPath({ cssThemes, cssOutPath }) {
     //* build the final string
     const beforeArrayString = `before: [${beforeString}],`;
     const afterArrayString = `after: [${afterString}]`;
-    acc += `'${themeName}': { css: '${cssOutPath}/${themeName}.css', foreign: { ${beforeArrayString} ${afterArrayString} } },\n`
+    acc += `'${themeName}':{css:'${cssOutPath}/${themeName}.css',foreign:{${beforeArrayString}${afterArrayString}}}`;
     return acc;
   }, '');
 }
