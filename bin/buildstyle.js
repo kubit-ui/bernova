@@ -184,7 +184,7 @@ async function writeJs({
       if (crrCssFile) {
         const { name: cssFileName, path: cssFilePath } = crrCssFile;
         const crrCssFilePath = path.resolve(dir, cssFilePath, cssFileName);
-        const cssFileContent = fileExists(dir, crrCssFileName)
+        const cssFileContent = fileExists(dir, crrCssFilePath)
           ? (await fs.readFile(crrCssFilePath, 'utf8')).replace(/\s+/g, '')
           : '';
         const foreignCss = { before: '', after: '' };
