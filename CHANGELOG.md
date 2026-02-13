@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.1
+
+### Patch Changes
+
+- Fixed the error behaviour in build style script
+
+  Pull Request
+
 ## 1.5.0
 
 ### Minor Changes
