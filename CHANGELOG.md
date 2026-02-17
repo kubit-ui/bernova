@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.4
+
+### Patch Changes
+
+- Fixed the default style interface
+
+  Pull Request
+
 ## 1.5.3
 
 ### Patch Changes
