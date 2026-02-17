@@ -285,7 +285,7 @@ const generateProvider = async ({
   dir,
   providerDocs,
   declarationHelp,
-  providerName: originalProviderName,
+  providerName,
   compilerType,
 }) => {
   //? write stats and dependencies documents
@@ -294,9 +294,9 @@ const generateProvider = async ({
   const providerDir = path.resolve(__dirname, './template/providerTemplate.js');
   let template = await fs.readFile(providerDir, 'utf8');
   //* customize provider name
-  const providerName = lowerCaseFirstChar(originalProviderName);
+  const providerFileName = lowerCaseFirstChar(providerName);
   template = template.replace(/\$_Provider_\$/g, providerName);
-  await writeDoc(`${dir}/${providerName}.js`, template, `${providerName}.js`);
+  await writeDoc(path.join(dir, `${providerFileName}.js`), template, `${providerFileName}.js`);
 
   if (declarationHelp) {
     //? write provider declare document
@@ -307,9 +307,9 @@ const generateProvider = async ({
     let templateDeclare = await fs.readFile(providerDirDeclare, 'utf8');
     templateDeclare = templateDeclare.replace(/\$_Provider_\$/g, providerName);
     await writeDoc(
-      `${dir}/${providerName}.d.ts`,
+      path.join(dir, `${providerFileName}.d.ts`),
       templateDeclare,
-      `${providerName}.d.ts`
+      `${providerFileName}.d.ts`
     );
   }
 };
