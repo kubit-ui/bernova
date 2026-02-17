@@ -20,6 +20,15 @@ const { compilerTypeValid } = require('../../constants');
 const { simplifyName } = require('../simplifyName/simplifyName.utils');
 
 /**
+ * Convert the first character of a string to lowercase
+ * @param {string} str - input string
+ * @return {string} - string with first character in lowecase
+ */
+const lowerCaseFirstChar = (str = 'provider') => {
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}
+
+/**
  * Return the content wrapped in an anonymous object
  * to avoid polluting the global scope
  * 
@@ -285,8 +294,9 @@ const generateProvider = async ({
   const providerDir = path.resolve(__dirname, './template/providerTemplate.js');
   let template = await fs.readFile(providerDir, 'utf8');
   //* customize provider name
+  const providerFileName = lowerCaseFirstChar(providerName);
   template = template.replace(/\$_Provider_\$/g, providerName);
-  await writeDoc(`${dir}/${providerName}.js`, template, `${providerName}.js`);
+  await writeDoc(path.join(dir, `${providerFileName}.js`), template, `${providerFileName}.js`);
 
   if (declarationHelp) {
     //? write provider declare document
@@ -297,9 +307,9 @@ const generateProvider = async ({
     let templateDeclare = await fs.readFile(providerDirDeclare, 'utf8');
     templateDeclare = templateDeclare.replace(/\$_Provider_\$/g, providerName);
     await writeDoc(
-      `${dir}/${providerName}.d.ts`,
+      path.join(dir, `${providerFileName}.d.ts`),
       templateDeclare,
-      `${providerName}.d.ts`
+      `${providerFileName}.d.ts`
     );
   }
 };
