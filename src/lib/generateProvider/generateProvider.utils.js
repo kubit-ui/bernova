@@ -26,18 +26,18 @@ const { simplifyName } = require('../simplifyName/simplifyName.utils');
  */
 const lowerCaseFirstChar = (str = 'provider') => {
   return str.charAt(0).toLowerCase() + str.slice(1);
-}
+};
 
 /**
  * Return the content wrapped in an anonymous object
  * to avoid polluting the global scope
- * 
+ *
  * @param {string} content - string content
  * @returns {string} - wrapped content
  */
 const anonimousWrapper = (content) => {
   return `export default {${content}}`;
-}
+};
 
 /**
  * Return the content wrapper in a typescript interface
@@ -47,11 +47,11 @@ const anonimousWrapper = (content) => {
  */
 const interfaceWrapper = (content, iName) => {
   return `export interface ${iName} {${content}}\n`;
-}
+};
 
 /**
  * Write a js file required for the provider`s stats
- * 
+ *
  * @param {object} param
  * @param {string} param.dir - main root dir
  * @param {string} param.content - file content
@@ -60,16 +60,24 @@ const interfaceWrapper = (content, iName) => {
  * @param {string | null} param.declare - typescript declare file name
  * @return {void}
  */
-const createStatFragment = async ({ dir, content, fileName, theme, declare = null}) => {
-  const fileContent = declare ? interfaceWrapper(content, declare) : anonimousWrapper(content);
+const createStatFragment = async ({
+  dir,
+  content,
+  fileName,
+  theme,
+  declare = null,
+}) => {
+  const fileContent = declare
+    ? interfaceWrapper(content, declare)
+    : anonimousWrapper(content);
   const relativePath = `stats/${theme}/${fileName}`;
   const filePath = path.resolve(dir, relativePath);
   await writeDoc(filePath, fileContent, relativePath);
-}
+};
 
 /**
  * Generate every js file required for the provide`s stats
- * 
+ *
  * @interface IProviderDocs {
  *  [themeName: string]: {
  *    cssPath: string,
@@ -82,14 +90,19 @@ const createStatFragment = async ({ dir, content, fileName, theme, declare = nul
  *    afterFiles?: string[],
  *  }
  * }
- * 
+ *
  * @param {object} param
  * @param {string} param.dir - main root dir
  * @param {IProviderDocs} param.providerDoc - provider stats info
  * @param {boolean} param.declarationHelp - prop to handler the create typescript declaration files
  * @param {'foundationOnly' | 'componentOnly' | 'full'} - prop to prevent rewrite unnecessary files
  */
-const buildStatsDoc = async ({ providerDocs, declarationHelp, compilerType, dir }) => {
+const buildStatsDoc = async ({
+  providerDocs,
+  declarationHelp,
+  compilerType,
+  dir,
+}) => {
   const allThemes = Object.entries(providerDocs);
   const allThemesNames = [];
   for (const [theme, values] of allThemes) {
@@ -98,7 +111,9 @@ const buildStatsDoc = async ({ providerDocs, declarationHelp, compilerType, dir 
     //? write foreign css path
     const beforeFilesExists = values.beforeFiles?.length > 0;
     const afterFilesExists = values.afterFiles?.length > 0;
-    const beforeKeyValue = beforeFilesExists ? `before:${values.beforeFiles}` : '';
+    const beforeKeyValue = beforeFilesExists
+      ? `before:${values.beforeFiles}`
+      : '';
     const afterKeyValue = afterFilesExists ? `after:${values.afterFiles}` : '';
     const foreignsExists = beforeFilesExists || afterFilesExists;
     let foreignKeyValue = foreignsExists ? 'foreign:{' : '';
@@ -107,91 +122,151 @@ const buildStatsDoc = async ({ providerDocs, declarationHelp, compilerType, dir 
     foreignKeyValue += afterKeyValue;
     foreignKeyValue += foreignsExists ? '}' : '';
     //? write css path
-    const cssThemeContent = 'cssPath' in values ? `'${theme}':{css:'${values.cssPath}',${foreignKeyValue}}` : ''; 
-    await createStatFragment({ dir, content: cssThemeContent, fileName: 'cssTheme.js', theme });
+    const cssThemeContent =
+      'cssPath' in values
+        ? `'${theme}':{css:'${values.cssPath}',${foreignKeyValue}}`
+        : '';
+    await createStatFragment({
+      dir,
+      content: cssThemeContent,
+      fileName: 'cssTheme.js',
+      theme,
+    });
     if (declarationHelp) {
       const foreignDeclare = 'foreign?:{before?:string[],after?:string[]}';
-      const cssThemeDeclareContent = 'cssPath' in values ? `'${theme}':{css:string,${foreignDeclare}}` : '';
+      const cssThemeDeclareContent =
+        'cssPath' in values ? `'${theme}':{css:string,${foreignDeclare}}` : '';
       const declareThemeName = `${simplifyName(theme)}CssTheme`;
       await createStatFragment({
         dir,
         content: cssThemeDeclareContent,
         fileName: 'cssTheme.d.ts',
         theme,
-        declare: declareThemeName
-      })
+        declare: declareThemeName,
+      });
     }
     if (compilerType !== compilerTypeValid.foundationOnly) {
       //? write css class names [js file]
-      const cssClassNamesContent = 'classNames' in values ? `'${theme}':{${values.classNames.doc}}` : '';
-      await createStatFragment({ dir, content: cssClassNamesContent, fileName: 'cssClassNames.js', theme });
+      const cssClassNamesContent =
+        'classNames' in values ? `'${theme}':{${values.classNames.doc}}` : '';
+      await createStatFragment({
+        dir,
+        content: cssClassNamesContent,
+        fileName: 'cssClassNames.js',
+        theme,
+      });
       //? write css available components [js file]
-      const cssAvCompContent = 'availableComp' in values ? `'${theme}':{${values.availableComp.doc}}` : '';
-      await createStatFragment({ dir, content: cssAvCompContent, fileName: 'cssAvailableComponents.js', theme });
+      const cssAvCompContent =
+        'availableComp' in values
+          ? `'${theme}':{${values.availableComp.doc}}`
+          : '';
+      await createStatFragment({
+        dir,
+        content: cssAvCompContent,
+        fileName: 'cssAvailableComponents.js',
+        theme,
+      });
       if (declarationHelp) {
         //? write css class names [typescript declaration file]
-        const cssClNmDeclareContent = 'classNames' in values ? `'${theme}':{${values.classNames.declare}}` : '';
+        const cssClNmDeclareContent =
+          'classNames' in values
+            ? `'${theme}':{${values.classNames.declare}}`
+            : '';
         const declareCssClNm = `${simplifyName(theme)}CssClassNames`;
         await createStatFragment({
           dir,
           content: cssClNmDeclareContent,
           fileName: 'cssClassNames.d.ts',
           theme,
-          declare: declareCssClNm
-        })
+          declare: declareCssClNm,
+        });
         //? write css available components [typescript declaration file]
-        const cssAvCompDeclareContent = 'availableComp' in values ? `'${theme}':{${values.availableComp.declare}}` : '';
+        const cssAvCompDeclareContent =
+          'availableComp' in values
+            ? `'${theme}':{${values.availableComp.declare}}`
+            : '';
         const declareCssAvComp = `${simplifyName(theme)}CssAvailableComponents`;
         await createStatFragment({
           dir,
           content: cssAvCompDeclareContent,
           fileName: 'cssAvailableComponents.d.ts',
           theme,
-          declare: declareCssAvComp
-        })
+          declare: declareCssAvComp,
+        });
       }
     }
     if (compilerType !== compilerTypeValid.componentOnly) {
       //? write css variables [js file]
-      const cssVarContent = 'variables' in values ? `'${theme}':{${values.variables.doc}}` : '';
-      await createStatFragment({ dir, content: cssVarContent, fileName: 'cssVars.js', theme });
+      const cssVarContent =
+        'variables' in values ? `'${theme}':{${values.variables.doc}}` : '';
+      await createStatFragment({
+        dir,
+        content: cssVarContent,
+        fileName: 'cssVars.js',
+        theme,
+      });
       //? write css global styles [js file]
-      const cssGlobalStylesContent = 'globalStyles' in values ? `'${theme}':{${values.globalStyles.doc}}` : '';
-      await createStatFragment({ dir, content: cssGlobalStylesContent, fileName: 'cssGlobalStyles.js', theme });
+      const cssGlobalStylesContent =
+        'globalStyles' in values
+          ? `'${theme}':{${values.globalStyles.doc}}`
+          : '';
+      await createStatFragment({
+        dir,
+        content: cssGlobalStylesContent,
+        fileName: 'cssGlobalStyles.js',
+        theme,
+      });
       //? write css media queries [js file]
-      const cssMediaQueriesContent = 'mediaQueries' in values ? `'${theme}':{${values.mediaQueries.doc}}` : '';
-      await createStatFragment({ dir, content: cssMediaQueriesContent, fileName: 'cssMediaQueries.js', theme });
+      const cssMediaQueriesContent =
+        'mediaQueries' in values
+          ? `'${theme}':{${values.mediaQueries.doc}}`
+          : '';
+      await createStatFragment({
+        dir,
+        content: cssMediaQueriesContent,
+        fileName: 'cssMediaQueries.js',
+        theme,
+      });
       if (declarationHelp) {
         //? write css variables [typescript declaration file]
-        const cssVarDeclareContent = 'variables' in values ? `'${theme}':{${values.variables.declare}}` : '';
+        const cssVarDeclareContent =
+          'variables' in values
+            ? `'${theme}':{${values.variables.declare}}`
+            : '';
         const declareCssVar = `${simplifyName(theme)}CssVars`;
         await createStatFragment({
           dir,
           content: cssVarDeclareContent,
           fileName: 'cssVars.d.ts',
           theme,
-          declare: declareCssVar
-        })
+          declare: declareCssVar,
+        });
         //? write css global styles [typescript declaration file]
-        const cssGlobalStylesDeclareContent = 'globalStyles' in values ? `'${theme}':{${values.globalStyles.declare}}` : '';
+        const cssGlobalStylesDeclareContent =
+          'globalStyles' in values
+            ? `'${theme}':{${values.globalStyles.declare}}`
+            : '';
         const declareCssGlobalStyles = `${simplifyName(theme)}CssGlobalStyles`;
         await createStatFragment({
           dir,
           content: cssGlobalStylesDeclareContent,
           fileName: 'cssGlobalStyles.d.ts',
           theme,
-          declare: declareCssGlobalStyles
-        })
+          declare: declareCssGlobalStyles,
+        });
         //? write css media queries [typescript declaration file]
-        const cssMediaQueriesDeclareContent = 'mediaQueries' in values ? `'${theme}':{${values.mediaQueries.declare}}` : '';
+        const cssMediaQueriesDeclareContent =
+          'mediaQueries' in values
+            ? `'${theme}':{${values.mediaQueries.declare}}`
+            : '';
         const declareCssMediaQueries = `${simplifyName(theme)}CssMediaQueries`;
         await createStatFragment({
           dir,
           content: cssMediaQueriesDeclareContent,
           fileName: 'cssMediaQueries.d.ts',
           theme,
-          declare: declareCssMediaQueries
-        })
+          declare: declareCssMediaQueries,
+        });
       }
     }
   }
@@ -248,7 +323,7 @@ const buildStatsDoc = async ({ providerDocs, declarationHelp, compilerType, dir 
       statsDPieces.cssAvailableComponents += `${simplifiedName}CssAvailableComponents`;
       statsDPieces.cssGlobalStyles += `${simplifiedName}CssGlobalStyles`;
       statsDPieces.cssMediaQueries += `${simplifiedName}CssMediaQueries`;
-    } 
+    }
   });
   statsPieces.cssThemes += '}';
   statsPieces.cssVars += '}';
@@ -257,7 +332,11 @@ const buildStatsDoc = async ({ providerDocs, declarationHelp, compilerType, dir 
   statsPieces.cssGlobalStyles += '}';
   statsPieces.cssMediaQueries += '}';
   const statsFileTemplate = `${statsPieces.toImport}\n${statsPieces.cssThemes}\n${statsPieces.cssVars}\n${statsPieces.cssClassNames}\n${statsPieces.cssAvailableComponents}\n${statsPieces.cssGlobalStyles}\n${statsPieces.cssMediaQueries}\n`;
-  await writeDoc(path.join(dir, 'stats/stats.js'), statsFileTemplate, 'stats.js');
+  await writeDoc(
+    path.join(dir, 'stats/stats.js'),
+    statsFileTemplate,
+    'stats.js',
+  );
   if (declarationHelp) {
     statsDPieces.cssThemes += ';';
     statsDPieces.cssVars += ';';
@@ -266,14 +345,18 @@ const buildStatsDoc = async ({ providerDocs, declarationHelp, compilerType, dir 
     statsDPieces.cssGlobalStyles += ';';
     statsDPieces.cssMediaQueries += ';';
     const statsDFileTemplate = `${statsDPieces.toImport}\n${statsDPieces.cssThemes}\n${statsDPieces.cssVars}\n${statsDPieces.cssClassNames}\n${statsDPieces.cssAvailableComponents}\n${statsDPieces.cssGlobalStyles}\n${statsDPieces.cssMediaQueries}\n`;
-    await writeDoc(path.join(dir, 'stats/stats.d.ts'), statsDFileTemplate, 'stats.d.ts');
+    await writeDoc(
+      path.join(dir, 'stats/stats.d.ts'),
+      statsDFileTemplate,
+      'stats.d.ts',
+    );
   }
-}
+};
 
 /**
  * Create the Bernova provider file and the stats document
- * 
- * @param {object} param 
+ *
+ * @param {object} param
  * @param {string} param.dir destination directory
  * @param {object} param.providerDocs provider documentation
  * @param {boolean} param.declarationHelp enable typescript declaration files
@@ -296,20 +379,24 @@ const generateProvider = async ({
   //* customize provider name
   const providerFileName = lowerCaseFirstChar(providerName);
   template = template.replace(/\$_Provider_\$/g, providerName);
-  await writeDoc(path.join(dir, `${providerFileName}.js`), template, `${providerFileName}.js`);
+  await writeDoc(
+    path.join(dir, `${providerFileName}.js`),
+    template,
+    `${providerFileName}.js`,
+  );
 
   if (declarationHelp) {
     //? write provider declare document
     const providerDirDeclare = path.resolve(
       __dirname,
-      './template/providerTemplate.d.ts'
+      './template/providerTemplate.d.ts',
     );
     let templateDeclare = await fs.readFile(providerDirDeclare, 'utf8');
     templateDeclare = templateDeclare.replace(/\$_Provider_\$/g, providerName);
     await writeDoc(
       path.join(dir, `${providerFileName}.d.ts`),
       templateDeclare,
-      `${providerFileName}.d.ts`
+      `${providerFileName}.d.ts`,
     );
   }
 };

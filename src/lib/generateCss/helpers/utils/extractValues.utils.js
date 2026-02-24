@@ -10,6 +10,7 @@ const { cssProps } = require('../../../../constants/cssProps.js');
 const extractValues = ({ styles, dynamicValues }) => {
   return Object.entries(styles)
     .filter(([key]) => cssProps[key])
+    .filter(([key, value]) => value !== undefined && value !== null)
     .map(([key, value]) => {
       //* replace the js key for css property
       const cssProperty = cssProps[key];
