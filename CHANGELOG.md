@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.5
+
+### Patch Changes
+
+- Delete the first dot in globalStyles names
+
+  Pull Request
+
 ## 1.5.4
 
 ### Patch Changes
