@@ -17,7 +17,7 @@ const generateGlobalStyles = (globalStyles) => {
       if (allTargets.length) {
         allTargets.forEach((target) => {
           const formattedTarget = simplifyName(target);
-          acc.globalDocs.doc += `  ${formattedTarget}: '${target}',\n`;
+          acc.globalDocs.doc += `  ${formattedTarget}: '${target.replace('.', '')}',\n`;
           acc.globalDocs.declare += `  ${formattedTarget}: string;\n`;
         });
       }
