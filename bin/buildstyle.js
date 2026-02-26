@@ -159,7 +159,7 @@ async function writeJs({
   dir,
   minifyJS,
   preventMoveJS,
-  provider,
+  provider = { name: '' },
   type = '',
   embedCss,
   cssFiles,
@@ -207,7 +207,7 @@ async function writeJs({
       }
     }
   }
-  if (jsFile.name === `${provider.name.toLocaleLowerCase()}.js` && embedCss && cssFiles.length > 0) {
+  if (jsFile.name === `${lowerCaseFirstChar(provider.name)}.js` && embedCss && cssFiles.length > 0) {
     const newMethods = /* js */`
     #linkBuilder = (css, id) => {
       if (typeof document === 'undefined') return;
@@ -239,7 +239,7 @@ async function writeJs({
     });
     jsDocFile = providerTemplate.replace(match, newMethods.trim());
   }
-  if (jsFile.name === `${provider.name.toLocaleLowerCase()}.d.ts` && embedCss && cssFiles.length > 0) {
+  if (jsFile.name === `${lowerCaseFirstChar(provider.name)}.d.ts` && embedCss && cssFiles.length > 0) {
     const newMethods = /* ts */`
     #linkBuilder(css: string, id: string): void;
     #handlerThemes(data: { css: string }): void;
@@ -498,7 +498,8 @@ async function getJsFiles({ dir, customOutDirs, provider, themes, preventMoveDTS
     : [];
   if (provider) {
     //* provider file
-    const providerFileName = `${provider.name.toLocaleLowerCase()}.js`;
+    const providerNameFromJson = lowerCaseFirstChar(provider.name);
+    const providerFileName = `${providerNameFromJson}.js`;
     const providerOutPath = customOutDirs?.provider ? customOutDirs.provider : provider.path;
     pushUniqueFile(jsFiles, { name: providerFileName, path: provider.path, outPath: providerOutPath });
     //* stats file
@@ -524,7 +525,7 @@ async function getJsFiles({ dir, customOutDirs, provider, themes, preventMoveDTS
     //* declaration files
     if (provider.declarationHelp && !preventMoveDTS) {
       //* provider declaration file
-      const providerDtsFileName = `${provider.name.toLocaleLowerCase()}.d.ts`;
+      const providerDtsFileName = `${providerNameFromJson}.d.ts`;
       pushUniqueFile(jsFiles, { name: providerDtsFileName, path: provider.path, outPath: providerOutPath });
       //* stats declaration file
       const statsDtsFileName = 'stats.d.ts';
@@ -642,4 +643,13 @@ function overwriteCustomOutDirs({ jsonCustomOutDirs, cliCustomOutDirs }) {
     mergeOutDirs = { ...mergeOutDirs, ...cliCustomOutDirs };
   }
   return Object.keys(mergeOutDirs).length > 0 ? mergeOutDirs : undefined;
+}
+
+/**
+ * Convert the first character of a string to lowercase
+ * @param {string} str - input string
+ * @return {string} - string with first character in lowecase
+ */
+function lowerCaseFirstChar (str = 'provider') {
+  return str.charAt(0).toLowerCase() + str.slice(1);
 }
