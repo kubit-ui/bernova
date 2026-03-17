@@ -147,7 +147,7 @@ jobs:
           if npm view "bernova@${VERSION}" version 2>/dev/null; then
             echo "⚠️ bernova@${VERSION} already published, skipping"
           else
-            npm publish --access public --provenance
+            npm publish --access public --ignore-scripts
             echo "✅ Published bernova@${VERSION} to NPM"
           fi
         env:
