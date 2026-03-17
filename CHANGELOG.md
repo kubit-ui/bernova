@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.1
+
+### Patch Changes
+
+- Add verbose logging and YARN_NPM_AUTH_TOKEN for publish debug
+
 ## 1.7.0
 
 ### Minor Changes
