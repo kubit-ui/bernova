@@ -4,8 +4,7 @@ name: Auto Release with Changesets
 # It combines the automation of the old system with Changesets' changelog generation
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - main
 
@@ -18,7 +17,7 @@ permissions:
 jobs:
   auto-release:
     name: Auto Release
-    if: github.event.pull_request.merged == true
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
 
     steps:
@@ -65,16 +64,13 @@ jobs:
       - name: Detect version bump type
         id: detect-version
         run: |
-          BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          echo "Commit: $COMMIT_MSG"
 
-          echo "Branch: $BRANCH_NAME"
-          echo "PR Title: $PR_TITLE"
-
-          # Detect from branch name
-          if [[ "$BRANCH_NAME" =~ ^(break|breaking)/ ]] || [[ "$PR_TITLE" =~ ^(break|breaking): ]]; then
+          # Detect from commit message (covers both direct push and PR merge)
+          if [[ "$COMMIT_MSG" =~ ^(break|breaking) ]]; then
             VERSION_TYPE="major"
-          elif [[ "$BRANCH_NAME" =~ ^(feat|feature)/ ]] || [[ "$PR_TITLE" =~ ^feat: ]]; then
+          elif [[ "$COMMIT_MSG" =~ ^feat ]]; then
             VERSION_TYPE="minor"
           else
             VERSION_TYPE="patch"
@@ -102,40 +98,30 @@ jobs:
         if: steps.check-changesets.outputs.has_changeset == 'false'
         run: |
           VERSION_TYPE="${{ steps.detect-version.outputs.version_type }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          CHANGESET_ID="auto-${SHORT_SHA}"
 
-          # Clean up PR title - remove conventional commit prefix for cleaner changelog
-          CLEAN_TITLE=$(echo "$PR_TITLE" | sed -E 's/^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|break|breaking)(\(.+?\))?:\s*//i')
+          # Clean up title - remove conventional commit prefix for cleaner changelog
+          CLEAN_TITLE=$(echo "$COMMIT_MSG" | head -n 1 | sed -E 's/^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|break|breaking)(\(.+?\))?:\s*//i')
 
-          # Extract first line of PR body as description (if exists)
-          DESCRIPTION=$(echo "$PR_BODY" | head -n 1 | sed 's/^[#*-]\s*//')
+          # Create changeset content
+          cat > .changeset/${CHANGESET_ID}.md << EOF
+---
+"bernova": ${VERSION_TYPE}
+---
 
-          # Create changeset content with better formatting
-          cat > .changeset/auto-pr-${PR_NUMBER}.md << EOF
-          ---
-          "bernova": ${VERSION_TYPE}
-          ---
+${CLEAN_TITLE}
+EOF
 
-          ${CLEAN_TITLE}
-          EOF
-
-          # Add description if it's meaningful (not empty, not a template marker)
-          if [ -n "$DESCRIPTION" ] && [ "$DESCRIPTION" != "## Description" ] && [ "$DESCRIPTION" != "Description" ]; then
-            echo "" >> .changeset/auto-pr-${PR_NUMBER}.md
-            echo "$DESCRIPTION" >> .changeset/auto-pr-${PR_NUMBER}.md
-          fi
-
-          echo "✅ Auto-generated changeset for PR #${PR_NUMBER}"
-          cat .changeset/auto-pr-${PR_NUMBER}.md
+          echo "✅ Auto-generated changeset: ${CHANGESET_ID}"
+          cat .changeset/${CHANGESET_ID}.md
 
       - name: Commit auto-generated changeset
         if: steps.check-changesets.outputs.has_changeset == 'false'
         run: |
           git add .changeset/
-          git commit -m "chore: auto-generate changeset for PR #${{ github.event.pull_request.number }}" || echo "No changes to commit"
+          git commit -m "chore: auto-generate changeset [skip ci]" || echo "No changes to commit"
           git push origin main
 
       - name: Version packages
@@ -202,13 +188,26 @@ jobs:
               prerelease: false
             });
 
-      - name: Comment on PR
+      - name: Comment on associated PR
         if: steps.version.outputs.should_publish == 'true'
         uses: actions/github-script@v7
         with:
           script: |
             const version = '${{ steps.get-version.outputs.version }}';
             const versionType = '${{ steps.detect-version.outputs.version_type }}';
+
+            // Find associated PR for this commit
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: '${{ github.sha }}'
+            });
+
+            const mergedPr = prs.find(pr => pr.merged_at);
+            if (!mergedPr) {
+              core.info('No associated PR found, skipping comment');
+              return;
+            }
 
             const message = `## 🚀 Published to NPM!
 
@@ -237,6 +236,6 @@ jobs:
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: mergedPr.number,
               body: message
             });
