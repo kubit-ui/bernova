@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.2
+
+### Patch Changes
+
+- Use npm publish instead of changeset publish for reliable NPM publishing
+
 ## 1.7.1
 
 ### Patch Changes
