@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0
+
+### Minor Changes
+
+- Migrate from pnpm to Yarn Berry + add OxLint and OxFmt
+
 ## 1.5.5
 
 ### Patch Changes
