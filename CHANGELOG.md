@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.3
+
+### Patch Changes
+
+- Remove --provenance flag and add --ignore-scripts for npm publish
+
 ## 1.7.2
 
 ### Patch Changes
