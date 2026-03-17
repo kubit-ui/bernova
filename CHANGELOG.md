@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0
+
+### Minor Changes
+
+- Fix CI workflow and auto-release pipeline
+
 ## 1.6.0
 
 ### Minor Changes
