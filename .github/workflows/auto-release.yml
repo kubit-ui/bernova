@@ -135,16 +135,21 @@ jobs:
         run: |
           echo "🏗️ Building package..."
           yarn build
-        env:
-          NODE_ENV: production
+          echo "✅ Build complete"
+          echo "Version in package.json: $(node -p "require('./package.json').version")"
 
       - name: Publish to NPM
         run: |
           echo "🚀 Publishing to NPM..."
+          echo "Current version: $(node -p "require('./package.json').version")"
+          echo "Registry: https://registry.npmjs.org"
+          echo "NODE_AUTH_TOKEN is set: ${{ secrets.NPM_TOKEN != '' }}"
           yarn changeset:publish
+          echo "✅ Publish step complete"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         run: |
