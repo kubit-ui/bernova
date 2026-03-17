@@ -29,45 +29,56 @@ This project follows the **fork-based contribution model** to:
    git fetch upstream
    ```
 
-4. **Create a Feature Branch**: Always create a new branch for your changes. Use proper branch naming conventions for automatic version detection.
+4. **Install Dependencies**: This project uses **Yarn Berry** as package manager.
+
+   ```sh
+   # Enable Corepack (ships with Node.js)
+   corepack enable
+
+   # Install dependencies
+   yarn install
+   ```
+
+5. **Create a Feature Branch**: Always create a new branch for your changes. Use proper branch naming conventions for automatic version detection.
 
    ```sh
    git checkout -b <branch-type>/<branch-name>
    ```
 
-5. **Make Changes**:
+6. **Make Changes**:
    - Make your changes to the bernova codebase
    - Follow the coding standards outlined in our style guide
    - Add or update tests for your changes
    - Update documentation if necessary
-   - Test your changes thoroughly using `npm test`
+   - Test your changes thoroughly using `yarn test`
 
-6. **Commit Changes**: Use conventional commit messages for automatic versioning.
+7. **Commit Changes**: Use conventional commit messages for automatic versioning.
 
    ```sh
    git commit -m "feat(css): add new responsive grid system"
    ```
 
-7. **Keep Your Fork Updated**: Before pushing, sync with the upstream repository.
+8. **Keep Your Fork Updated**: Before pushing, sync with the upstream repository.
 
    ```sh
    git fetch upstream
    git rebase upstream/main
    ```
 
-8. **Push to Your Fork**: Push your changes to your forked repository (never to the original).
+9. **Push to Your Fork**: Push your changes to your forked repository (never to the original).
 
    ```sh
    git push origin <branch-name>
    ```
 
-9. **Open a Pull Request**:
-   - Go to the original [bernova repository](https://github.com/kubit-ui/bernova)
-   - Click "New pull request"
-   - Select "compare across forks"
-   - Choose your fork and branch as the source
-   - Fill out the PR template with details about your changes
-   - Submit the pull request for review
+10. **Open a Pull Request**:
+
+- Go to the original [bernova repository](https://github.com/kubit-ui/bernova)
+- Click "New pull request"
+- Select "compare across forks"
+- Choose your fork and branch as the source
+- Fill out the PR template with details about your changes
+- Submit the pull request for review
 
 ### Branch Naming & Automatic Publishing with Changesets
 
@@ -346,22 +357,74 @@ No manual changeset needed - it's all automatic! 🚀
 - Update **documentation** for new CSS classes and utilities
 - Follow the existing **code style** and patterns used in the project
 
-### Development Setup
+### Requirements
 
-Before contributing, make sure you have the development environment set up:
+Before contributing, ensure you have:
+
+- **Node.js**: v20.x or higher
+- **Yarn**: v4.x or higher (via Corepack)
+- **Git**: Latest version
+
+Check your versions:
 
 ```sh
-# Install dependencies (requires PNPM 9.0.0 or higher)
-pnpm install
+node --version  # Should show v20.x.x or higher
+yarn --version  # Should show 4.x.x
+```
+
+### Private Registry (optional)
+
+This repo uses the public npm registry by default. If your organization requires a **private registry** (JFrog Artifactory, Nexus, GitHub Packages, etc.), you can override it globally via environment variables — no need to modify any files.
+
+1. Add to your `~/.zshrc` (or `~/.bashrc`):
+
+```sh
+export YARN_NPM_REGISTRY_SERVER="https://your-org.example.com/your-npm-registry/"
+export YARN_NPM_ALWAYS_AUTH=true
+export YARN_ENABLE_STRICT_SSL=false
+```
+
+2. Reload your shell:
+
+```sh
+source ~/.zshrc
+```
+
+3. Verify:
+
+```sh
+yarn config get npmRegistryServer
+# Should show your private registry URL
+```
+
+This applies globally to all Yarn Berry projects. See `.env.example` for reference.
+
+### Development Setup
+
+```sh
+# Enable Corepack (ships with Node.js)
+corepack enable
+
+# Install dependencies
+yarn install
 
 # Build the CSS framework
-pnpm run build
+yarn build
 
 # Run tests
-pnpm test
+yarn test
+
+# Lint code
+yarn lint
+
+# Format code
+yarn format
+
+# Type check
+yarn typecheck
 
 # Watch for changes during development
-pnpm run dev
+yarn dev
 ```
 
 ### CSS Guidelines
@@ -379,8 +442,10 @@ When contributing CSS code to bernova:
 
 Before submitting your PR:
 
-1. **Build the framework**: Run `pnpm run build` to ensure no build errors
+1. **Build the framework**: Run `yarn build` to ensure no build errors
 2. **Test functionality**: Verify your CSS works as expected
 3. **Check responsiveness**: Test on different screen sizes
 4. **Validate markup**: Ensure HTML examples are valid
-5. **Run automated tests**: Use `pnpm test` to run the test suite
+5. **Run automated tests**: Use `yarn test` to run the test suite
+6. **Lint your code**: Run `yarn lint` to check for issues
+7. **Format your code**: Run `yarn format` to apply consistent formatting

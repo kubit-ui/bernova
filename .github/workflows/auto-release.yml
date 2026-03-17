@@ -34,24 +34,27 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Enable Corepack
+        run: corepack enable
 
-      - name: Get pnpm store directory
+      - name: Get Yarn cache directory
+        id: yarn-cache
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "CACHE_DIR=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
+      - name: Setup Yarn cache
         uses: actions/cache@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ${{ steps.yarn-cache.outputs.CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          yarn --version
+          yarn install --immutable
 
       - name: Configure Git
         run: |
@@ -136,7 +139,7 @@ jobs:
       - name: Version packages
         run: |
           echo "📦 Updating version and changelog..."
-          pnpm changeset version
+          yarn changeset version
 
           # Check if there are changes
           if git diff --quiet; then
@@ -156,13 +159,13 @@ jobs:
 
       - name: Build package
         if: steps.version.outputs.should_publish == 'true'
-        run: pnpm run build
+        run: yarn build
 
       - name: Publish to NPM
         if: steps.version.outputs.should_publish == 'true'
         run: |
           echo "🚀 Publishing to NPM..."
-          pnpm changeset publish --access public
+          yarn changeset publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -33,27 +33,28 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Enable Corepack
+        run: corepack enable
 
-      - name: Get pnpm store directory
+      - name: Get Yarn cache directory
+        id: yarn-cache
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "CACHE_DIR=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
+      - name: Setup Yarn cache
         uses: actions/cache@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ${{ steps.yarn-cache.outputs.CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         run: |
-          echo "Installing dependencies with pnpm..."
-          pnpm --version
-          pnpm install --frozen-lockfile
+          echo "Installing dependencies with yarn..."
+          yarn --version
+          yarn install --immutable
 
       - name: Validate Branch Naming
         id: branch-validation
@@ -109,9 +110,9 @@ jobs:
           echo "Running code quality checks..."
 
           # TypeScript type checking
-          if pnpm run --help | grep -q "type-check"; then
+          if yarn run --help 2>/dev/null | grep -q "typecheck" || true; then
             echo "Running TypeScript checks..."
-            if pnpm type-check; then
+            if yarn typecheck; then
               echo "✅ TypeScript checks passed"
               echo "typescript_valid=true" >> $GITHUB_OUTPUT
             else
@@ -129,8 +130,8 @@ jobs:
         run: |
           echo "Running tests..."
 
-          if pnpm run --help | grep -q "test"; then
-            if pnpm test; then
+          if true; then
+            if yarn test; then
               echo "✅ Tests passed"
               echo "tests_valid=true" >> $GITHUB_OUTPUT
             else
