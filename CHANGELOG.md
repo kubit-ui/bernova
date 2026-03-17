@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.4
+
+### Patch Changes
+
+- Remove Yarn Berry packageManager constraint for Yarn 1 compatibility
+
 ## 1.7.3
 
 ### Patch Changes
