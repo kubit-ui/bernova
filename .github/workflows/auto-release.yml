@@ -140,16 +140,18 @@ jobs:
 
       - name: Publish to NPM
         run: |
-          echo "🚀 Publishing to NPM..."
-          echo "Current version: $(node -p "require('./package.json').version")"
-          echo "Registry: https://registry.npmjs.org"
-          echo "NODE_AUTH_TOKEN is set: ${{ secrets.NPM_TOKEN != '' }}"
-          yarn changeset:publish
-          echo "✅ Publish step complete"
+          VERSION=$(node -p "require('./package.json').version")
+          echo "🚀 Publishing bernova@${VERSION} to NPM..."
+
+          # Check if version already exists on registry
+          if npm view "bernova@${VERSION}" version 2>/dev/null; then
+            echo "⚠️ bernova@${VERSION} already published, skipping"
+          else
+            npm publish --access public --provenance
+            echo "✅ Published bernova@${VERSION} to NPM"
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         run: |
