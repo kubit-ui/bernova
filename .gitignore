@@ -6,17 +6,12 @@ bernova.config.json
 coverage/
 __reports__
 
-# Lock files - keep pnpm-lock.yaml, ignore others
-yarn.lock
+# Lock files - keep yarn.lock, ignore others
 package-lock.json
+pnpm-lock.yaml
 
 # Build output
 dist
-
-# PNPM specific
-.pnpm-debug.log*
-.pnpm-store/
-pnpm-debug.log
 
 # Cache and temp files
 .cache/
