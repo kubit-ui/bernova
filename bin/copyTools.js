@@ -4,10 +4,10 @@ const { bvBuildScript } = require('./functions/scriptFx');
 (async () => {
   try {
     const buildScript = await bvBuildScript();
-    await buildScript.fullBuild();
-    console.log('Styles built successfully.');
+    await buildScript.copyTools();
+    console.log('Tools files copied successfully.');
   } catch (error) {
-    console.error('Error building styles:', error);
+    console.error('Error copying tools files:', error);
     process.exit(1);
   }
 })();

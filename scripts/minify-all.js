@@ -51,15 +51,15 @@ async function minifyCLIFile(filePath) {
 
     console.log(
       `🗜️  ${path.basename(
-        filePath
-      )}: ${originalSize} → ${minifiedSize} bytes (${savings}% smaller)`
+        filePath,
+      )}: ${originalSize} → ${minifiedSize} bytes (${savings}% smaller)`,
     );
 
     fs.writeFileSync(filePath, minifiedContent);
   } catch (error) {
     console.error(
       `❌ Error minifying ${path.basename(filePath)}:`,
-      error.message
+      error.message,
     );
   }
 }
@@ -105,7 +105,7 @@ async function main() {
   // Exclude the main index.js (already minified by Vite)
   const filesToMinify = allJSFiles.filter(
     (file) =>
-      !file.endsWith('dist/index.js') && !file.endsWith('dist/index.js.map') && !file.includes('providerTemplate.js')
+      !file.endsWith('dist/index.js') && !file.endsWith('dist/index.js.map'),
   );
 
   if (filesToMinify.length === 0) {
@@ -136,7 +136,7 @@ async function main() {
   console.log(
     `💾 Space saved: ${totalSavings}% (${
       totalOriginalSize - totalMinifiedSize
-    } bytes)`
+    } bytes)`,
   );
   console.log(`📁 Files processed: ${filesToMinify.length}`);
 }

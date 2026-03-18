@@ -16,8 +16,12 @@
   },
   "bin": {
     "bernova": "./dist/bin/bernova.js",
+    "bv-config": "./dist/bin/createConfigFile.js",
     "bv-build": "./dist/bin/buildstyle.js",
-    "bv-config": "./dist/bin/createConfigFile.js"
+    "bv-pre-build": "./dist/bin/preBuildStyles.js",
+    "bv-copy-css": "./dist/bin/copyCss.js",
+    "bv-copy-tools": "./dist/bin/copyTools.js",
+    "bv-copy-provider": "./dist/bin/copyProvider.js"
   },
   "_moduleAliases": {
     "@": "src"

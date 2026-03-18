@@ -150,7 +150,7 @@ async function bernovaStyles(compilerType) {
         : path.join('./styles', `${name}.css`);
       const { themeByPosition, variablesExtracted, classesExtracted } =
         await handlerForeignThemes({ dir, foreignThemes });
-      
+
       themeRegister[name] = generateThemeRegister({
         cssPath,
         rootDocs,
@@ -162,7 +162,9 @@ async function bernovaStyles(compilerType) {
         foreignBeforeFiles: themeByPosition.before,
         foreignAfterFiles: themeByPosition.after,
       });
-      spinner.succeed(`Theme register generated for provider for theme: ${name}`);
+      spinner.succeed(
+        `Theme register generated for provider for theme: ${name}`,
+      );
     }
   }
 
