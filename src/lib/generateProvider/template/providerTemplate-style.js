@@ -18,40 +18,25 @@ export class $_Provider_$ {
   #linkId;
   #jsInCss;
   /* Bernova provider methods */
-  #linkBuilder = (url, id) => {
+  #linkBuilder = (css, id) => {
     if (typeof document === 'undefined') return;
-    let linkElement = document.getElementById(id);
-    if (!linkElement) {
-      linkElement = document.createElement('link');
-      linkElement.id = id;
-      linkElement.rel = 'stylesheet';
-      document.head.appendChild(linkElement);
+    let styleElement = document.getElementById(id);
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = id;
+      styleElement.type = 'text/css';
+      document.head.appendChild(styleElement);
     }
-    const baseUrl = document.location.origin;
-    const href = new URL(url, baseUrl).href;
-    linkElement.href = href;
+    styleElement.innerHTML = css;
   };
   #handlerThemes = (data) => {
-    const { css, foreign } = data;
-    const beforeFiles = foreign?.before || [];
-    const afterFiles = foreign?.after || [];
-    //* set the lower priority foreign themes
-    beforeFiles.forEach((url, idx) => {
-      const id = `${this.#linkId}-foreign-before-${idx + 1}`;
-      this.#linkBuilder(url, id);
-    });
-    //* set main theme
+    const { css } = data;
     this.#linkBuilder(css, this.#linkId);
-    //* set the higher priority foreign themes
-    afterFiles.forEach((url, idx) => {
-      const id = `${this.#linkId}-foreign-after-${idx + 1}`;
-      this.#linkBuilder(url, id);
-    });
   };
   #cleanUpLinks = () => {
     if (typeof document === 'undefined') return;
-    const links = document.querySelectorAll(`link[id^="${this.#linkId}"]`);
-    links.forEach((link) => link.remove());
+    const style = document.getElementById(this.#linkId);
+    if (style) style.remove();
   };
   /* Bernova provider methods */
 

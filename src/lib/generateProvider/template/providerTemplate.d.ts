@@ -33,7 +33,7 @@ export declare class $_Provider_$ {
   #linkId: string;
   #jsInCss: boolean;
   /* Bernova provider methods */
-  #linkBuilder: (url: string, id: string) => void;
+  #linkBuilder: (css: string, id: string) => void;
   #handlerThemes: (data: {
     css: string;
     foreign?: { high?: string[]; low?: string[] };

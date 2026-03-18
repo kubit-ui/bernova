@@ -46,7 +46,7 @@ const anonimousWrapper = (content) => {
  * @return {string} - wrapped content
  */
 const interfaceWrapper = (content, iName) => {
-  return `export interface ${iName} {${content}}\n`;
+  return `interface ${iName} {${content}}\ndeclare const ${iName}: ${iName};\nexport default ${iName};`;
 };
 
 /**
@@ -303,12 +303,12 @@ const buildStatsDoc = async ({
     statsPieces.cssGlobalStyles += `...${simplifiedName}CssGlobalStyles,`;
     statsPieces.cssMediaQueries += `...${simplifiedName}CssMediaQueries,`;
     if (declarationHelp) {
-      statsDPieces.toImport += `import type { ${simplifiedName}CssTheme } from './${theme}/cssTheme.d.ts';\n`;
-      statsDPieces.toImport += `import type { ${simplifiedName}CssVars } from './${theme}/cssVars.d.ts';\n`;
-      statsDPieces.toImport += `import type { ${simplifiedName}CssClassNames } from './${theme}/cssClassNames.d.ts';\n`;
-      statsDPieces.toImport += `import type { ${simplifiedName}CssAvailableComponents } from './${theme}/cssAvailableComponents.d.ts';\n`;
-      statsDPieces.toImport += `import type { ${simplifiedName}CssGlobalStyles } from './${theme}/cssGlobalStyles.d.ts';\n`;
-      statsDPieces.toImport += `import type { ${simplifiedName}CssMediaQueries } from './${theme}/cssMediaQueries.d.ts';\n`;
+      statsDPieces.toImport += `import type ${simplifiedName}CssTheme from './${theme}/cssTheme.d.ts';\n`;
+      statsDPieces.toImport += `import type ${simplifiedName}CssVars from './${theme}/cssVars.d.ts';\n`;
+      statsDPieces.toImport += `import type ${simplifiedName}CssClassNames from './${theme}/cssClassNames.d.ts';\n`;
+      statsDPieces.toImport += `import type ${simplifiedName}CssAvailableComponents from './${theme}/cssAvailableComponents.d.ts';\n`;
+      statsDPieces.toImport += `import type ${simplifiedName}CssGlobalStyles from './${theme}/cssGlobalStyles.d.ts';\n`;
+      statsDPieces.toImport += `import type ${simplifiedName}CssMediaQueries from './${theme}/cssMediaQueries.d.ts';\n`;
       if (idx > 0) {
         statsDPieces.cssThemes += ' & ';
         statsDPieces.cssVars += ' & ';
@@ -374,7 +374,8 @@ const generateProvider = async ({
   //? write stats and dependencies documents
   await buildStatsDoc({ providerDocs, declarationHelp, compilerType, dir });
   //? write provider
-  const providerDir = path.resolve(__dirname, './template/providerTemplate.js');
+  const templateFile = './template/providerTemplate-link.js';
+  const providerDir = path.resolve(__dirname, templateFile);
   let template = await fs.readFile(providerDir, 'utf8');
   //* customize provider name
   const providerFileName = lowerCaseFirstChar(providerName);
