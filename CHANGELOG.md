@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.5
+
+### Patch Changes
+
+- Merge pull request #34 from kubit-ui/feat/new-bv-scripts-options-and-improve-stats-interfaces
+
 ## 1.7.4
 
 ### Patch Changes
