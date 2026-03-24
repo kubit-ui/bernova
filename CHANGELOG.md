@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.6
+
+### Patch Changes
+
+- Merge pull request #35 from kubit-ui/feat/new-function-named-literals
+
 ## 1.7.5
 
 ### Patch Changes
