@@ -59,7 +59,7 @@ const generateCssStyles = ({ source, mediaConfig, prefix }) => {
   }) => {
     const {
       styles,
-      lib: { $dynamicValues, ...lib },
+      lib: { $dynamicValues, $literals, ...lib },
       other,
     } = separateStyles(source);
     const hasStyles = Object.entries(styles).length > 0;
@@ -76,6 +76,7 @@ const generateCssStyles = ({ source, mediaConfig, prefix }) => {
       register,
       hasStyles,
       prefix: prefixed,
+      literals: $literals,
     });
 
     if (hasStyles) {
@@ -150,6 +151,7 @@ const generateCssStyles = ({ source, mediaConfig, prefix }) => {
             $advancedSelectors,
             $foreign,
             $dynamicValues,
+            $literals,
             ...css
           } = value;
 
@@ -167,6 +169,7 @@ const generateCssStyles = ({ source, mediaConfig, prefix }) => {
             register,
             hasStyles,
             prefix: prefixed,
+            literals: $literals,
           });
 
           if (hasStyles) {
@@ -212,7 +215,7 @@ const generateCssStyles = ({ source, mediaConfig, prefix }) => {
             advancedSelectorHandler(
               $advancedSelectors,
               ruleName,
-              processSource
+              processSource,
             );
           }
           if ($foreign) {

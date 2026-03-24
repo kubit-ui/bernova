@@ -105,7 +105,10 @@ async function main() {
   // Exclude the main index.js (already minified by Vite)
   const filesToMinify = allJSFiles.filter(
     (file) =>
-      !file.endsWith('dist/index.js') && !file.endsWith('dist/index.js.map'),
+      !file.endsWith('dist/index.js') &&
+      !file.endsWith('dist/index.js.map') &&
+      !file.includes('providerTemplate-link.js') &&
+      !file.includes('providerTemplate-style.js'),
   );
 
   if (filesToMinify.length === 0) {

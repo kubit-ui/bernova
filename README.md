@@ -45,6 +45,7 @@
     - [Complex Styles](#Complex-Styles)
     - [Foreign Feature](#Foreign-Feature)
     - [Dynamic Values Feature](#Dynamic-Values-Feature)
+    - [Literals Values Feature](#Literals-Values-Feature)
 - [Fonts](#setting-text-fonts)
 - [Reset CSS](#enable-reset-css)
 - [Typescript helps](#typescript-helps)
@@ -1107,6 +1108,50 @@ export const Container = ({ bgColor, borderColor, children }) => {
 ```
 
 In this case, only the styles for the header will be generated, and in the development tools, for _nav_item_ and _login_button_, the existing classes for BUTTON and LINK will be returned.
+
+### Literals Values Feature
+
+You might need to set a literal value in the component's styles object for Bernova. By default, it would be processed as a CSS class with its respective values. However, if that value is within the _$literals_ key, these values can be retrieved by the provider or set in the **cssClassNames** object.
+
+```js
+const BUTTON = {
+  padding: '4px',
+  border_radius: '8px',
+  PRIMARY: {
+    color: 'white',
+    background: 'red',
+    $literals: {
+      loader_variant: 'loader-primary.json',
+    },
+  },
+  SECONDARY: {
+    color: 'black',
+    background: 'gray',
+    $literals: {
+      loader_variant: 'loader-secondary.json',
+    },
+  },
+};
+```
+
+Example of implementation:
+
+```jsx
+import { useClassNames } from '@/hooks';
+
+const Button = (props) => {
+  const styles = useClassNames({ component: 'BUTTON', variant: 'PRIMARY' });
+
+  /**
+   * styles = {
+   *  button: 'button button--primary',
+   *  loader_variant: 'loader-primary.json'
+   * }
+   */
+};
+```
+
+**Important**: Within literals, values can be of different primitive types: numbers, booleans, etc.
 
 ## Access to classNames
 

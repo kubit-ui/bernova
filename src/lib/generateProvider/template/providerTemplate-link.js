@@ -147,16 +147,22 @@ export class $_Provider_$ {
     }
     Object.entries(COMPONENT).forEach(([key, value]) => {
       if (key.startsWith(startV)) return;
-      if (!(key in structure)) {
+      if (!(key in structure) && value) {
         structure[key] = value;
       }
     });
     if (!!additionalClassNames && Object.keys(additionalClassNames).length) {
       Object.entries(additionalClassNames).forEach(([key, value]) => {
         if (!(key in structure)) {
-          structure[key] = '';
+          structure[key] = value;
+        } else {
+          const existingValue = structure[key].split(' ');
+          const newValue = value.split(' ');
+          const combinedValues = Array.from(
+            new Set([...existingValue, ...newValue]),
+          );
+          structure[key] = combinedValues.join(' ');
         }
-        structure[key] += ` ${value}`;
       });
     }
     return structure;
