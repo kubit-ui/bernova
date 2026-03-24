@@ -72,6 +72,7 @@ const typingStyles = ({ mediaConfig }) => {
   const cssAdvancedSelectorsName = 'CssAdvancedSelectorsType';
   const cssMediaQueriesName = 'CssMediaQueriesType';
   const cssForeignName = 'CssForeignType';
+  const cssLiteralsName = 'CssLiteralsType';
   //* bases types
   const cssPropsWithTarget = `${cssLibPropsName} & { $target?: string; }`;
   const cssPropsType = `export type ${cssPropsName} = {\n${generateKeysType({
@@ -82,22 +83,23 @@ const typingStyles = ({ mediaConfig }) => {
     {
       object: cssPseudoClasses,
       type: `${cssPseudoClassesName} | ${cssPseudoElementsName} | ${cssPropsWithTarget}`,
-    }
+    },
   )}}\n`;
   const cssPseudoElementsType = `export type ${cssPseudoElementsName} = {\n${generateKeysType(
     {
       object: cssPseudoElements,
       type: `${cssPseudoElementsName} | ${cssPseudoClassesName} | ${cssLibPropsName}`,
-    }
+    },
   )}}\n`;
   const cssAdvancedSelectorsType = `export type ${cssAdvancedSelectorsName} = \n${generateAdvancedSelectorsType(
     {
       advancedSelectors: cssAdvancedSelectors,
       type: cssPropsWithTarget,
-    }
+    },
   )}\n`;
-  const mediaQueriesType = `export type ${cssMediaQueriesName} = ${cssPropsName} & { $type?: string; $values?: { [key: string]: string }; }\n`;
+  const mediaQueriesType = `export type ${cssMediaQueriesName} = ${cssPropsName} & { $type?: string; $values?: { [key: string]: string; }; }\n`;
   const foreignType = `export type ${cssForeignName} = { [key:string]: { component: object; variant?: string | unknown; name: string; } }\n`;
+  const literalsType = `export type ${cssLiteralsName} = { [key: string]: string | number | boolean | null | undefined | bigint | symbol; }\n`;
   ///? lib
   //* lib names
   const cssLibPseudoClassesName = 'CssLibPseudoClassesType';
@@ -107,21 +109,23 @@ const typingStyles = ({ mediaConfig }) => {
   const cssLibMediaQueriesName = 'CssLibMediaQueriesType';
   const cssForeignLibName = 'CssForeignLibType';
   const cssDynamicValuesName = 'CssDynamicValuesType';
+  const cssLibLiteralsName = 'CssLibLiteralsType';
   //* lib types
   const libProps = `export type ${cssLibPropsName} = ${cssPropsName} & ${cssLibPseudoClassesName} & ${cssLibPseudoElementsName} & ${cssLibAdvancedSelectorsName} & ${cssDynamicValuesName} & ${cssLibAttributesName}${
     hasMediaConfig ? ` & ${cssLibMediaQueriesName}` : ''
-  } & ${cssForeignLibName};\n`;
+  } & ${cssForeignLibName} & ${cssLibLiteralsName};\n`;
   const pseudoClasses = `export type ${cssLibPseudoClassesName} = {\n  $pseudoClasses?: ${cssPseudoClassesName} \n}\n`;
   const pseudoElements = `export type ${cssLibPseudoElementsName} = {\n  $pseudoElements?: ${cssPseudoElementsName} \n}\n`;
   const advancedSelectors = `export type ${cssLibAdvancedSelectorsName} = {\n  $advancedSelectors?: ${cssAdvancedSelectorsName}[] \n}\n`;
   const attributes = `export type ${cssLibAttributesName} = { $attributes?: { [key: string]: ${cssLibPropsName} } | { [key: string]: { [key: string]: ${cssLibPropsName} } } }\n`;
   const mediaQueries = hasMediaConfig
     ? `export type ${cssLibMediaQueriesName} = {\n  $mediaQueries?: {\n    [key: string]: ${cssMediaQueriesName}\n  } | {\n${generateMediaTypes(
-        { mediaConfig, type: cssLibPropsName }
+        { mediaConfig, type: cssLibPropsName },
       )}  }\n}\n`
     : '';
   const foreign = `export type ${cssForeignLibName} = {\n  $foreign?: ${cssForeignName} \n}\n`;
   const dynamicValues = `export type ${cssDynamicValuesName} = {\n  $dynamicValues?: string[]; \n}\n`;
+  const literals = `export type ${cssLibLiteralsName} = {\n  $literals?: ${cssLiteralsName}; \n}\n`;
 
   return `
 ${cssPropsType}
@@ -130,6 +134,7 @@ ${cssPseudoElementsType}
 ${cssAdvancedSelectorsType}
 ${mediaQueriesType}
 ${foreignType}
+${literalsType}
 ${pseudoClasses}
 ${pseudoElements}
 ${dynamicValues}
@@ -137,6 +142,7 @@ ${advancedSelectors}
 ${attributes}
 ${mediaQueries}
 ${foreign}
+${literals}
 ${libProps}
   `;
 };

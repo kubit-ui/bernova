@@ -1,4 +1,3 @@
-
 export type CssPropsType = {
   scrollbar_width?: string;
   scrollbar_color?: string;
@@ -274,199 +273,660 @@ export type CssPropsType = {
   mask_border_outset?: string;
   mask_border_repeat?: string;
   $content?: string;
-}
+};
 
 export type CssPseudoClassesType<T> = {
-  fullscreen?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  modal?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  picture_in_picture?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  autofill?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  enabled?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  disabled?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  read_only?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  read_write?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  placeholder_shown?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  default?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  checked?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  indeterminate?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  blank?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  valid?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  invalid?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  in_range?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  out_of_range?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  required?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  optional?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  user_valid?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  user_invalid?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  dir?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  lang?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  any_link?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  link?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  visited?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  local_link?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  target?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  target_within?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  scope?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  playing?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  paused?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  current?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  past?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  future?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  root?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  empty?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  nth_child?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  nth_last_child?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  first_child?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  last_child?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  only_child?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  nth_of_type?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  nth_last_of_type?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  first_of_type?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  last_of_type?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  only_of_type?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  active?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  focus?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  focus_visible?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  focus_within?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  hover?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  is?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  not?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  where?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  has?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  nth_col?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  nth_last_col?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  host?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  host_context?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  defined?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_any?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_any_link?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_focusring?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_full_screen?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_full_screen_ancestor?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_full_screen_document?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_full_screen_element?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_full_screen_root?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_placeholder?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_read_only?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_read_write?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_submit_invalid?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_ui_invalid?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  moz_ui_valid?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_any?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_any_link?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_autofill?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_current?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_full_screen?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_full_screen_ancestor?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_full_screen_document?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_full_screen_element?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_full_screen_root?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_input_placeholder?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_read_only?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_read_write?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_scrollbar?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_scrollbar_button?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_scrollbar_thumb?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_scrollbar_track?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_scrollbar_track_piece?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_search_cancel_button?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-  webkit_search_results_button?: CssPseudoClassesType<T> | CssPseudoElementsType<T> | CssLibPropsType<T> & { $target?: string; };
-}
+  fullscreen?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  modal?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  picture_in_picture?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  autofill?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  enabled?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  disabled?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  read_only?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  read_write?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  placeholder_shown?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  default?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  checked?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  indeterminate?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  blank?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  valid?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  invalid?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  in_range?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  out_of_range?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  required?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  optional?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  user_valid?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  user_invalid?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  dir?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  lang?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  any_link?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  link?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  visited?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  local_link?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  target?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  target_within?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  scope?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  playing?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  paused?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  current?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  past?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  future?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  root?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  empty?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  nth_child?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  nth_last_child?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  first_child?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  last_child?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  only_child?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  nth_of_type?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  nth_last_of_type?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  first_of_type?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  last_of_type?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  only_of_type?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  active?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  focus?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  focus_visible?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  focus_within?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  hover?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  is?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  not?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  where?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  has?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  nth_col?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  nth_last_col?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  host?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  host_context?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  defined?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_any?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_any_link?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_focusring?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_full_screen?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_full_screen_ancestor?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_full_screen_document?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_full_screen_element?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_full_screen_root?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_placeholder?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_read_only?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_read_write?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_submit_invalid?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_ui_invalid?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  moz_ui_valid?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_any?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_any_link?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_autofill?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_current?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_full_screen?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_full_screen_ancestor?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_full_screen_document?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_full_screen_element?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_full_screen_root?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_input_placeholder?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_read_only?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_read_write?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_scrollbar?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_scrollbar_button?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_scrollbar_thumb?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_scrollbar_track?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_scrollbar_track_piece?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_search_cancel_button?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+  webkit_search_results_button?:
+    | CssPseudoClassesType<T>
+    | CssPseudoElementsType<T>
+    | (CssLibPropsType<T> & { $target?: string });
+};
 
 export type CssPseudoElementsType<T> = {
-  before?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  after?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  first_letter?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  first_line?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  selection?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  backdrop?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  placeholder?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  marker?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  spelling_error?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  grammar_error?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
+  before?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  after?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  first_letter?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  first_line?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  selection?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  backdrop?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  placeholder?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  marker?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  spelling_error?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  grammar_error?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
   cue?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  cue_region?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  part?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  slotted?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  file_selector_button?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  target_text?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  highlight?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_color_swatch?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_focus_inner?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_list_bullet?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_list_number?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_meter_bar?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_progress_bar?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_range_progress?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_range_thumb?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  moz_range_track?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_inner_spin_button?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_meter_even_less_good_value?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_meter_inner_element?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_meter_optimum_value?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_meter_suboptimum_value?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_progress_bar?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_progress_inner_element?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_progress_value?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_scrollbar?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_scrollbar_button?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_scrollbar_thumb?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_scrollbar_track?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_scrollbar_track_piece?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_search_cancel_button?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_search_results_button?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_slider_runnable_track?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_slider_thumb?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_resizer?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  webkit_input_placeholder?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  placeholder_shown?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  autofill?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  progress_value?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  progress_bar?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  meter_optimum?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  meter_suboptimum?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-  meter_sub_suboptimum?: CssPseudoElementsType<T> | CssPseudoClassesType<T> | CssLibPropsType<T>;
-}
+  cue_region?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  part?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  slotted?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  file_selector_button?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  target_text?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  highlight?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_color_swatch?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_focus_inner?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_list_bullet?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_list_number?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_meter_bar?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_progress_bar?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_range_progress?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_range_thumb?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  moz_range_track?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_inner_spin_button?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_meter_even_less_good_value?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_meter_inner_element?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_meter_optimum_value?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_meter_suboptimum_value?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_progress_bar?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_progress_inner_element?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_progress_value?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_scrollbar?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_scrollbar_button?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_scrollbar_thumb?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_scrollbar_track?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_scrollbar_track_piece?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_search_cancel_button?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_search_results_button?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_slider_runnable_track?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_slider_thumb?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_resizer?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  webkit_input_placeholder?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  placeholder_shown?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  autofill?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  progress_value?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  progress_bar?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  meter_optimum?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  meter_suboptimum?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+  meter_sub_suboptimum?:
+    | CssPseudoElementsType<T>
+    | CssPseudoClassesType<T>
+    | CssLibPropsType<T>;
+};
 
-export type CssAdvancedSelectorsType<T> = 
- { adjacent?: CssLibPropsType<T> & { $target?: string; }; }
- | { child?: CssLibPropsType<T> & { $target?: string; }; }
- | { descendant?: CssLibPropsType<T> & { $target?: string; }; }
- | { near?: CssLibPropsType<T> & { $target?: string; }; }
- | { concat?: CssLibPropsType<T> & { $target?: string; }; }
- | { column?: CssLibPropsType<T> & { $target?: string; }; }
+export type CssAdvancedSelectorsType<T> =
+  | { adjacent?: CssLibPropsType<T> & { $target?: string } }
+  | { child?: CssLibPropsType<T> & { $target?: string } }
+  | { descendant?: CssLibPropsType<T> & { $target?: string } }
+  | { near?: CssLibPropsType<T> & { $target?: string } }
+  | { concat?: CssLibPropsType<T> & { $target?: string } }
+  | { column?: CssLibPropsType<T> & { $target?: string } };
 
+export type CssMediaQueriesType = CssPropsType & {
+  $type?: string;
+  $values?: { [key: string]: string };
+};
 
-export type CssMediaQueriesType = CssPropsType & { $type?: string; $values?: { [key: string]: string }; }
+export type CssForeignType = {
+  [key: string]: {
+    component: object;
+    variant?: string | unknown;
+    name: string;
+  };
+};
 
-export type CssForeignType = { [key:string]: { component: object; variant?: string | unknown; name: string; } }
+export type CssLiteralsType = {
+  [key: string]: string | number | boolean | null | undefined | bigint | symbol;
+};
 
 export type CssLibPseudoClassesType<T> = {
-  $pseudoClasses?: CssPseudoClassesType<T>
-}
+  $pseudoClasses?: CssPseudoClassesType<T>;
+};
 
 export type CssLibPseudoElementsType<T> = {
-  $pseudoElements?: CssPseudoElementsType<T>
-}
+  $pseudoElements?: CssPseudoElementsType<T>;
+};
 
 export type CssDynamicValuesType = {
-  $dynamicValues?: string[]; 
-}
+  $dynamicValues?: string[];
+};
 
 export type CssLibAdvancedSelectorsType<T> = {
-  $advancedSelectors?: CssAdvancedSelectorsType<T>[] 
-}
+  $advancedSelectors?: CssAdvancedSelectorsType<T>[];
+};
 
-export type CssLibAttributesType<T> = { $attributes?: { [key: string]: CssLibPropsType<T> } | { [key: string]: { [key: string]: CssLibPropsType<T> } } }
+export type CssLibAttributesType<T> = {
+  $attributes?:
+    | { [key: string]: CssLibPropsType<T> }
+    | { [key: string]: { [key: string]: CssLibPropsType<T> } };
+};
 
 export type CssLibMediaQueriesType<T> = {
-  $mediaQueries?: { [key: string]: CssMediaQueriesType } | T
-}
+  $mediaQueries?: { [key: string]: CssMediaQueriesType } | T;
+};
 
 export type CssForeignLibType = {
-  $foreign?: CssForeignType 
-}
+  $foreign?: CssForeignType;
+};
 
-export type CssLibPropsType<T> = CssPropsType & CssLibPseudoClassesType<T> & CssLibPseudoElementsType<T> & CssLibAdvancedSelectorsType<T> & CssDynamicValuesType & CssLibAttributesType<T> & CssLibMediaQueriesType<T> & CssForeignLibType;
+export type CssLibLiteralsType = {
+  $literals?: CssLiteralsType;
+};
 
-  
+export type CssLibPropsType<T> = CssPropsType &
+  CssLibPseudoClassesType<T> &
+  CssLibPseudoElementsType<T> &
+  CssLibAdvancedSelectorsType<T> &
+  CssDynamicValuesType &
+  CssLibAttributesType<T> &
+  CssLibMediaQueriesType<T> &
+  CssForeignLibType &
+  CssLibLiteralsType;

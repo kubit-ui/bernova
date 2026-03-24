@@ -8,6 +8,45 @@
 const { simplifyName } = require('../../../simplifyName/simplifyName.utils');
 
 /**
+ * List of primitive value indicators for special string processing
+ */
+const primitiveValues = [
+  '$boolean$',
+  '$number$',
+  '$string$',
+  '$bigint$',
+  '$symbol$',
+  '$undefined$',
+  '$null$',
+];
+/**
+ * Processes a string value and determines its type
+ * @param {string} str - The input string to process
+ * @returns {Object} - An object containing the processed value and its type
+ */
+const processStringValue = (str) => {
+  if (/^Symbol\.for\(['"](.+)['"]\)$/.test(str)) {
+    const match = str.match(/^Symbol\.for\(['"](.+)['"]\)$/);
+    return { vl: Symbol.for(match[1]), tp: 'symbol' };
+  } else if (/^-?\d+n$/.test(str)) {
+    return { vl: BigInt(str.slice(0, -1)), tp: 'bigint' }; // remove the 'n' and convert to BigInt
+  } else if (!isNaN(str) && !isNaN(parseFloat(str))) {
+    return { vl: Number(str), tp: 'number' };
+  } else if (str === 'true') {
+    return { vl: true, tp: 'boolean' };
+  } else if (str === 'false') {
+    return { vl: false, tp: 'boolean' };
+  } else if (str === 'null') {
+    return { vl: null, tp: 'null' };
+  } else if (str === 'undefined') {
+    return { vl: undefined, tp: 'undefined' };
+  } else if (primitiveValues.includes(str)) {
+    return { vl: `''`, tp: str.replaceAll('$', '') };
+  }
+  return { vl: `'${str}'`, tp: 'string' };
+};
+
+/**
  * Handles the CSS register to generate provider documentation and tools
  * Recursively processes nested component structures and creates exports
  *
@@ -84,20 +123,21 @@ const handlerRegister = ({ register, prefix }) => {
           acc.prov.doc += `${currentSpace}${provKey}: '${component}',\n`;
           acc.prov.declare += `${currentSpace}${provKey}: string,\n`;
         } else if (typeof value === 'string') {
-          // Handle string mappings (class name aliases)
+          //? Handle string mappings (class name aliases)
 
-          // Generate tools documentation from string value
+          const { vl, tp } = processStringValue(value);
+          //* Generate tools documentation from string value
           const compFromValue = simplifyName(value).replace(`${prefix}_`, '');
           if (!componentsRegistered.has(compFromValue)) {
             componentsRegistered.add(compFromValue);
-            acc.tools.doc += `  ${compFromValue}: '${value}',\n`;
-            acc.tools.declare += `  ${compFromValue}: string,\n`;
+            acc.tools.doc += `  ${compFromValue}: ${vl},\n`;
+            acc.tools.declare += `  ${compFromValue}: ${tp},\n`;
           }
 
-          // Generate provider documentation with string value
+          //* Generate provider documentation with string value
           const provKey = component.split('__').at(-1);
-          acc.prov.doc += `${currentSpace}${provKey}: '${value}',\n`;
-          acc.prov.declare += `${currentSpace}${provKey}: string,\n`;
+          acc.prov.doc += `${currentSpace}${provKey}: ${vl},\n`;
+          acc.prov.declare += `${currentSpace}${provKey}: ${tp},\n`;
         } else if (typeof value === 'function') {
           // Handle dynamic value functions (special cases for type generation)
           if (component === 'dynamic_values') {
@@ -113,7 +153,7 @@ const handlerRegister = ({ register, prefix }) => {
         comp: { simple: '', object: '' }, // Component type definitions
         prov: { doc: '', declare: '' }, // Provider documentation and types
         tools: { doc: '', declare: '' }, // Tools utilities and types
-      }
+      },
     );
   };
 

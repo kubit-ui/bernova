@@ -25,6 +25,7 @@ const setRegister = ({
   mainComponent,
   hasStyles,
   prefix,
+  literals,
 }) => {
   // Initialize main component in register if not exists
   if (!(mainComponent in register)) {
@@ -52,6 +53,26 @@ const setRegister = ({
         ? `${prefix}${component} ${prefix}${component}--${variant}` // Base + variant classes
         : `${prefix}${component}--${variant}`; // Variant only
     }
+  }
+
+  // Handle literals registration if provided
+  if (literals) {
+    Object.entries(literals).forEach(([literalKey, literalValue]) => {
+      const lValue = String(literalValue);
+      if (!!variant) {
+        const v = `$_${formattedStatKey(variant)}`;
+        register[mainComponent][v][literalKey] = lValue;
+        if (!(literalKey in register[mainComponent])) {
+          const lValueType =
+            literalValue === null
+              ? '$null$'
+              : `$${String(typeof literalValue)}$`;
+          register[mainComponent][literalKey] = lValueType;
+        }
+      } else {
+        register[mainComponent][literalKey] = lValue;
+      }
+    });
   }
 };
 
@@ -101,6 +122,7 @@ const formatRuleName = ({
   hasStyles,
   prefix,
   register = {},
+  literals,
 }) => {
   let className = '';
   // Use theRule directly if provided (for pseudo-classes, selectors, etc.)
@@ -119,6 +141,7 @@ const formatRuleName = ({
         mainComponent: cleanKey,
         hasStyles,
         prefix,
+        literals,
       });
     }
   } else {
@@ -142,6 +165,7 @@ const formatRuleName = ({
         variant,
         hasStyles,
         prefix,
+        literals,
       });
     } else if (lowerKey) {
       className = `${mainComponent}--${lowerKey}`;
@@ -153,6 +177,7 @@ const formatRuleName = ({
         variant: lowerKey,
         hasStyles,
         prefix,
+        literals,
       });
     }
   }
