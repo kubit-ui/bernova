@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.7
+
+### Patch Changes
+
+- Merge pull request #36 from kubit-ui/fix/addtional-value-condition
+
 ## 1.7.6
 
 ### Patch Changes
