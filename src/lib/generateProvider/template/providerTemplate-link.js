@@ -155,7 +155,7 @@ export class $_Provider_$ {
       Object.entries(additionalClassNames).forEach(([key, value]) => {
         if (!(key in structure)) {
           structure[key] = value;
-        } else {
+        } else if (value) {
           const existingValue = structure[key].split(' ');
           const newValue = value.split(' ');
           const combinedValues = Array.from(
