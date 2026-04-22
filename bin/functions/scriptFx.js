@@ -115,7 +115,7 @@ async function bvBuildScript() {
       const fileBaseOutDir = getBaseOutDir({ baseOutDir, type });
       const outPath = path.join(fileBaseOutDir, fileOutPath);
       //! --> This logic will be deleted in future versions (the preventProcessJs flag check) <--
-      if (preventProcessJs) {
+      if (!preventProcessJs) {
         await preBuildStyles();
       }
       await writeToolsInBuild({
