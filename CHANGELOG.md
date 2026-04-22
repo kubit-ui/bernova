@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.9
+
+### Patch Changes
+
+- Merge pull request #38 from kubit-ui/fix/prevent-process-js-logic-fixed
+
 ## 1.7.8
 
 ### Patch Changes
