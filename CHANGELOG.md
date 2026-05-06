@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.10
+
+### Patch Changes
+
+- Merge pull request #39 from kubit-ui/fix/prevent-the-unmount-links-unnecesarily
+
 ## 1.7.9
 
 ### Patch Changes
