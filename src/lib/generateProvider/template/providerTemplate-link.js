@@ -55,7 +55,7 @@ export class $_Provider_$ {
   };
   /* Bernova provider methods */
 
-  constructor({ linkId, jsInCss } = {}) {
+  constructor({ linkId, jsInCss, currentTheme } = {}) {
     this.#themes = cssThemes;
     this.#themesVariables = cssVars;
     this.#themesClassNames = cssClasses;
@@ -63,7 +63,10 @@ export class $_Provider_$ {
     this.#themesGlobalStyles = cssGlobalStyles;
     this.#themesMediaQueries = cssMediaQueries;
     this.#linkId = linkId || 'kb-styled-link';
-    this.#currentTheme = Object.keys(cssThemes)[0];
+    this.#currentTheme =
+      currentTheme in this.#themes
+        ? currentTheme
+        : Object.keys(this.#themes)[0];
     this.#jsInCss = !!jsInCss;
     this.getComponentStyles = this.getComponentStyles.bind(this);
 
@@ -82,7 +85,7 @@ export class $_Provider_$ {
     return this.#currentTheme;
   }
   set themeSelected(themeName) {
-    if (themeName in this.#themes) {
+    if (themeName in this.#themes && themeName !== this.#currentTheme) {
       if (this.#jsInCss) {
         this.#cleanUpLinks();
         this.#handlerThemes(this.#themes[themeName]);

@@ -41,18 +41,22 @@ export declare class $_Provider_$ {
   #cleanUpLinks: () => void;
   /* Bernova provider methods */
 
-  constructor(options?: { linkId?: string; jsInCss?: boolean });
+  constructor(options?: {
+    linkId?: string;
+    jsInCss?: boolean;
+    currentTheme?: ThemesKeys;
+  });
 
   get themeSelected(): string | null;
   get allThemesNames(): string[];
-  get allThemes(): Record<string, string>;
+  get allThemes(): Record<ThemesKeys, string>;
   get variables(): VarFromTheme;
   get classNames(): ClassNameFromTheme;
   get components(): ComponentsFromTheme;
   get globalStyles(): GlobalStylesFromThemes;
   get mediaQueries(): MediaQueriesFromThemes;
 
-  set themeSelected(themeName: string);
+  set themeSelected(themeName: ThemesKeys);
 
   getComponentStyles<T extends ComponentsKey>(params: {
     variant?: string;
