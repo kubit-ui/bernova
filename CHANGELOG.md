@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.11
+
+### Patch Changes
+
+- Merge pull request #40 from kubit-ui/feat/bernova-provider-can-be-embed-in-development
+
 ## 1.7.10
 
 ### Patch Changes
