@@ -177,6 +177,7 @@ async function bernovaStyles(compilerType) {
       declarationHelp: provider.declarationHelp,
       providerName: provider.name,
       compilerType,
+      embedCss: Boolean(provider.embedCss),
     });
     spinner.succeed('Provider tools generated successfully.');
   }

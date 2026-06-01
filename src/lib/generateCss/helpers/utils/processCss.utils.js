@@ -1,5 +1,4 @@
 const postcss = require('postcss');
-const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 const postcssPresetEnv = require('postcss-preset-env');
 // const combineMediaQuery = require('postcss-combine-media-query'); // <- this plugin is not used in the provided code
@@ -19,23 +18,16 @@ const processCssWithPostcss = async (
   css,
   minified = false,
   prefix = '',
-  fonts = {}
+  fonts = {},
 ) => {
   const plugins = [
     postcssPresetEnv({
       stage: 0,
+      browsers: ['> 1%', 'last 2 versions', 'Firefox ESR', 'not dead'],
       autoprefixer: { grid: true },
       features: {
         'custom-properties': false, // <- Disable CSS variable resolution
       },
-    }),
-    autoprefixer({
-      overrideBrowserslist: [
-        '> 1%',
-        'last 2 versions',
-        'Firefox ESR',
-        'not dead',
-      ],
     }),
     // combineMediaQuery,
     fontMagician({
@@ -69,7 +61,7 @@ const processCssWithPostcss = async (
     plugins.push(
       cssnano({
         preset: 'default',
-      })
+      }),
     );
   }
 

@@ -44,7 +44,7 @@ const compileConfig = async ({ dir }) => {
         }
       } catch (error) {
         console.warn(
-          `Failed to load TypeScript configuration: ${error.message}`
+          `Failed to load TypeScript configuration: ${error.message}`,
         );
       }
     }
