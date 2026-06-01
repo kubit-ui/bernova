@@ -9,8 +9,8 @@ describe('compilerTypeValid constants', () => {
   });
 
   it('should have correct string values', () => {
-    expect(compilerTypeValid.foundationOnly).toBe('foundationOnly');
-    expect(compilerTypeValid.componentOnly).toBe('componentOnly');
+    expect(compilerTypeValid['foundationOnly']).toBe('foundation-only');
+    expect(compilerTypeValid['componentOnly']).toBe('component-only');
     expect(compilerTypeValid.full).toBe('full');
   });
 
