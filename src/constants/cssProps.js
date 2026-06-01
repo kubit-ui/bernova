@@ -10,7 +10,6 @@ const cssProps = {
   scroll_snap_align: 'scroll-snap-align',
   scroll_snap_stop: 'scroll-snap-stop',
   scroll_snap_type: 'scroll-snap-type',
-  webkit_scrollbar: 'webkit-scrollbar',
   scroll_container: 'scroll-container',
   scrollbar_aria_role: 'scrollbar-aria-role',
 
@@ -128,6 +127,7 @@ const cssProps = {
   // Box properties
   box_sizing: 'box-sizing',
   box_shadow: 'box-shadow',
+  box_orient: 'box-orient',
 
   // Size properties
   width: 'width',
@@ -207,6 +207,8 @@ const cssProps = {
   list_style_type: 'list-style-type',
   list_style_position: 'list-style-position',
   list_style_image: 'list-style-image',
+  line_clamp: 'line-clamp',
+  fallback: 'fallback',
 
   // Color properties
   color: 'color',
@@ -317,6 +319,11 @@ const cssProps = {
   mask_border_width: 'mask-border-width',
   mask_border_outset: 'mask-border-outset',
   mask_border_repeat: 'mask-border-repeat',
+
+  // legacy browser fallbacks and compatibility
+  webkit_line_clamp: '-webkit-line-clamp',
+  webkit_box_orient: '-webkit-box-orient',
+  moz_box_orient: '-moz-box-orient',
 
   //? only for pseudo-elements. Is the equivalent of content for ::before and ::after
   $content: 'content',

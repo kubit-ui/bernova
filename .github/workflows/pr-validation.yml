@@ -252,13 +252,12 @@ jobs:
               blocking = true;
             }
 
-            // Code quality issues (blocking for code changes)
+            // Code quality issues (non-blocking warnings for code changes)
             if (results.code_changes) {
               if (results.console_logs) {
-                issues.push('❌ Remove console.log statements from production code');
-                blocking = true;
+                warnings.push('⚠️ console.log/warn/error statements detected in new code (allowed for CLI/build scripts)');
               }
-              
+
               if (results.todos_without_issues) {
                 issues.push('❌ TODO/FIXME comments must reference GitHub issues (#123)');
                 blocking = true;

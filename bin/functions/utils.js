@@ -11,7 +11,7 @@ const { minify } = require('terser');
  */
 function modifyThemesPath({ cssThemes, cssOutPath }) {
   return Object.entries(cssThemes).reduce((acc, [themeName, { foreign }]) => {
-    const { before, after } = foreign;
+    const { before, after } = foreign || {};
     //* handle before
     const beforeString =
       before && Array.isArray(before) && before.length > 0
