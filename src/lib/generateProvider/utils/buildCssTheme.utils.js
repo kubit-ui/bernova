@@ -1,66 +1,64 @@
-const fs = require('fs').promises;
-const path = require('path');
+const fs = require('node:fs').promises;
+const path = require('node:path');
 const { fileExists } = require('../../fileExists/fileExists.utils');
 const { simplifyName } = require('../../simplifyName/simplifyName.utils');
 const { createStatFragment } = require('./createStatFragment.utils');
 
-const stringToArray = (str) => {
-  return eval(str);
+const stringToArray = str => {
+  return JSON.parse(str.replace(/'/g, '"'));
 };
-const getCssText = async (route) => {
+const getCssText = async route => {
   const routeResolve = path.resolve(route);
   return (await fs.readFile(routeResolve, 'utf8')).replace(/\s+/g, ' ');
 };
-const getForeignCss = async (files) => {
+const getForeignCss = async files => {
   let cssContent = '';
   for (const file of files) {
-    if (!(await fileExists(file))) {
-      console.log(`File ${file} does not exist`);
+    const filePath = path.resolve(file);
+    if (!(await fileExists('.', filePath))) {
+      console.log(`File ${filePath} does not exist`);
       continue;
     }
-    cssContent += await getCssText(file);
+    cssContent += await getCssText(filePath);
   }
   return cssContent;
 };
 
-const buildCssTheme = async ({
-  theme,
-  values,
-  embedCss,
-  declarationHelp,
-  dir,
-}) => {
+const getEmbedCssContent = async ({ theme, values }) => {
+  const { beforeFiles, afterFiles } = values;
+  const beforeArr = beforeFiles?.length > 0 ? stringToArray(beforeFiles) : [];
+  const afterArr = afterFiles?.length > 0 ? stringToArray(afterFiles) : [];
+  const [beforeContent, afterContent, mainContent] = await Promise.all([
+    getForeignCss(beforeArr),
+    getForeignCss(afterArr),
+    getCssText(values.cssPath),
+  ]);
+  const fullContent = `${beforeContent}${mainContent}${afterContent}`;
+  return `'${theme}':{css:\`${fullContent}\`}`;
+};
+
+const getReferencedCssContent = ({ theme, values }) => {
+  const hasBefore = values.beforeFiles?.length > 0;
+  const hasAfter = values.afterFiles?.length > 0;
+  //? write foreign css path
+  const beforeKeyValue = hasBefore ? `before:${values.beforeFiles}` : '';
+  const afterKeyValue = hasAfter ? `after:${values.afterFiles}` : '';
+  const foreignsExists = hasBefore || hasAfter;
+  let foreignKeyValue = foreignsExists ? 'foreign:{' : '';
+  foreignKeyValue += beforeKeyValue;
+  foreignKeyValue += beforeKeyValue.length && afterKeyValue.length ? ',' : '';
+  foreignKeyValue += afterKeyValue;
+  foreignKeyValue += foreignsExists ? '}' : '';
+  //? write css path
+  return `'${theme}':{css:'${values.cssPath}',${foreignKeyValue}}`;
+};
+
+const buildCssTheme = async ({ theme, values, embedCss, declarationHelp, dir }) => {
   if (!('cssPath' in values)) {
     return '';
   }
-  let cssThemeContent = '';
-  const beforeFilesExists = values.beforeFiles?.length > 0;
-  const afterFilesExists = values.afterFiles?.length > 0;
-  if (embedCss) {
-    const beforeArr = beforeFilesExists
-      ? stringToArray(values.beforeFiles)
-      : [];
-    const afterArr = afterFilesExists ? stringToArray(values.afterFiles) : [];
-    const beforeContent = await getForeignCss(beforeArr);
-    const afterContent = await getForeignCss(afterArr);
-    const mainContent = await getCssText(values.cssPath);
-    const content = `${beforeContent}${mainContent}${afterContent}`;
-    cssThemeContent = `'${theme}':{css:\`${content}\`}`;
-  } else {
-    //? write foreign css path
-    const beforeKeyValue = beforeFilesExists
-      ? `before:${values.beforeFiles}`
-      : '';
-    const afterKeyValue = afterFilesExists ? `after:${values.afterFiles}` : '';
-    const foreignsExists = beforeFilesExists || afterFilesExists;
-    let foreignKeyValue = foreignsExists ? 'foreign:{' : '';
-    foreignKeyValue += beforeKeyValue;
-    foreignKeyValue += beforeKeyValue.length && afterKeyValue.length ? ',' : '';
-    foreignKeyValue += afterKeyValue;
-    foreignKeyValue += foreignsExists ? '}' : '';
-    //? write css path
-    cssThemeContent = `'${theme}':{css:'${values.cssPath}',${foreignKeyValue}}`;
-  }
+  const cssThemeContent = embedCss ? await getEmbedCssContent({ theme, values }) : getReferencedCssContent({ theme, values });
+
   await createStatFragment({
     dir,
     content: cssThemeContent,
@@ -68,9 +66,7 @@ const buildCssTheme = async ({
     theme,
   });
   if (declarationHelp) {
-    const foreignDeclare = embedCss
-      ? ''
-      : ',foreign?:{before?:string[],after?:string[]}';
+    const foreignDeclare = embedCss ? '' : ',foreign?:{before?:string[],after?:string[]}';
     const cssThemeDeclareContent = `'${theme}':{css:string${foreignDeclare}}`;
     const declareThemeName = `${simplifyName(theme)}CssTheme`;
     await createStatFragment({

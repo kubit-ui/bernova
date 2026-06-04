@@ -11,28 +11,31 @@ describe('cssAdvancedSelectors constants', () => {
     expect(cssAdvancedSelectors).toHaveProperty('column');
   });
 
-  it('should have correct CSS combinator values', () => {
+  it('should have correct adjacent sibling selector', () => {
     expect(cssAdvancedSelectors.adjacent).toBe(' + ');
+  });
+
+  it('should have correct child selector', () => {
     expect(cssAdvancedSelectors.child).toBe(' > ');
+  });
+
+  it('should have correct descendant selector', () => {
     expect(cssAdvancedSelectors.descendant).toBe(' ');
+  });
+
+  it('should have correct general sibling selector', () => {
     expect(cssAdvancedSelectors.near).toBe(' ~ ');
+  });
+
+  it('should have correct concat selector without space', () => {
     expect(cssAdvancedSelectors.concat).toBe('');
+  });
+
+  it('should have correct column combinator', () => {
     expect(cssAdvancedSelectors.column).toBe(' || ');
   });
 
-  it('should be immutable object structure', () => {
+  it('should have exactly 6 selector types', () => {
     expect(Object.keys(cssAdvancedSelectors)).toHaveLength(6);
-  });
-
-  it('should have proper spacing for combinators', () => {
-    // Adjacent and near should have spaces around operators
-    expect(cssAdvancedSelectors.adjacent).toMatch(/^\s\+\s$/);
-    expect(cssAdvancedSelectors.near).toMatch(/^\s~\s$/);
-
-    // Child should have spaces around operator
-    expect(cssAdvancedSelectors.child).toMatch(/^\s>\s$/);
-
-    // Descendant should be just a space
-    expect(cssAdvancedSelectors.descendant).toBe(' ');
   });
 });

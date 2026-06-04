@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 const {
   generateBaseCss,
   compileThemes,
@@ -11,20 +11,16 @@ const {
   generateCssDoc,
   handlerForeignThemes,
 } = require('./lib');
-const {
-  validatePreviouslyExists,
-  processCssWithPostcss,
-} = require('./lib/generateCss/helpers');
+const { validatePreviouslyExists, processCssWithPostcss } = require('./lib/generateCss/helpers');
 const { compilerTypeValid } = require('./constants');
-const {
-  generateTypesTools,
-} = require('./lib/generateTypesTools/generateTypesTools.utils');
+const { generateTypesTools } = require('./lib/generateTypesTools/generateTypesTools.utils');
 const { generateTools } = require('./lib/generateTools/generateTools.utils');
+const { runStep } = require('./lib/runStep/runStep.utils');
 
 /**
  * Main function to compile Bernova styles based on configuration
  * Processes themes, generates CSS, and creates necessary files for the styling system
- *
+
  * @param {string} compilerType - The type of compilation to perform:
  *   - 'foundationOnly': Generate only foundation styles (variables, base styles)
  *   - 'componentOnly': Generate only component/theme styles
@@ -42,17 +38,7 @@ async function bernovaStyles(compilerType) {
 
   // Process each theme configuration sequentially
   for (const themeConfig of themes) {
-    const {
-      themeCss,
-      fonts,
-      resetCss,
-      bvTools,
-      name,
-      stylesPath,
-      typesTools,
-      foreignThemes,
-      prefix,
-    } = compileThemes({
+    const { themeCss, fonts, resetCss, bvTools, name, stylesPath, typesTools, foreignThemes, prefix } = compileThemes({
       themeConfig,
       dir,
     });
@@ -70,17 +56,14 @@ async function bernovaStyles(compilerType) {
           return themeCss;
       }
     })();
-    const { stylesCss, foundationsCss, stylesDocs, rootDocs, globalDocs } =
-      await generateCSS({
-        source,
-        baseCss,
-        compilerType,
-        prefix,
-      });
+    const { stylesCss, foundationsCss, stylesDocs, rootDocs, globalDocs } = await generateCSS({
+      source,
+      baseCss,
+      compilerType,
+      prefix,
+    });
 
-    const stylesDir = stylesPath
-      ? path.resolve(dir, stylesPath)
-      : path.resolve(dir, 'styles');
+    const stylesDir = path.resolve(dir, stylesPath ?? 'styles');
 
     const { cssDir, cssMinifiedDir, oldData } = await validatePreviouslyExists({
       stylesDir,
@@ -110,77 +93,88 @@ async function bernovaStyles(compilerType) {
 
     // Generate TypeScript type definitions if configured
     spinner.start('Verifying types tools...');
-    if (typesTools) {
-      spinner.succeed(`Types tools verified for theme: ${name}.`);
-      await generateTypesTools({
-        dir,
-        typesTools,
-        mediaConfig: media,
-        stylesDocs,
-      });
-    } else {
-      spinner.succeed(`No types tools found for theme: ${name}.`);
-    }
+    await runStep({
+      spinner,
+      condition: typesTools,
+      sccMsg: `Types tools verified for theme: ${name}.`,
+      fbMsg: `No types tools found for theme: ${name}.`,
+      cb: async () => {
+        await generateTypesTools({
+          dir,
+          typesTools,
+          mediaConfig: media,
+          stylesDocs,
+        });
+      },
+    });
 
-    const mediaDocs = media ? processMediaConfig({ mediaConfig: media }) : null;
+    const mediaDocs = media && processMediaConfig({ mediaConfig: media });
 
     // Generate development tools if configured (bvTools)
     spinner.start(`Processing bvTools for theme: ${name}...`);
-    if (bvTools) {
-      spinner.succeed(`bvTools found for theme: ${name}.`);
-      await generateTools({
-        bvTools,
-        compilerType,
-        name,
-        dir,
-        stylesDir,
-        stylesDocs,
-        rootDocs,
-        globalDocs,
-        mediaDocs,
-      });
-    } else {
-      spinner.succeed(`No bvTools found for theme: ${name}.`);
-    }
+    await runStep({
+      spinner,
+      condition: bvTools,
+      sccMsg: `bvTools found for theme: ${name}.`,
+      fbMsg: `No bvTools found for theme: ${name}.`,
+      cb: async () => {
+        await generateTools({
+          bvTools,
+          compilerType,
+          name,
+          dir,
+          stylesDir,
+          stylesDocs,
+          rootDocs,
+          globalDocs,
+          mediaDocs,
+        });
+      },
+    });
 
-    if (provider) {
-      spinner.start(`Generating theme register for theme: ${name}...`);
-      const cssPath = stylesPath
-        ? path.posix.join(stylesPath, `${name}.css`)
-        : path.posix.join('./styles', `${name}.css`);
-      const { themeByPosition, variablesExtracted, classesExtracted } =
-        await handlerForeignThemes({ dir, foreignThemes });
+    spinner.start(`Generating theme register for theme: ${name}...`);
+    await runStep({
+      spinner,
+      condition: provider,
+      sccMsg: `Theme register generated for provider for theme: ${name}`,
+      fbMsg: `No provider found for theme: ${name}`,
+      cb: async () => {
+        const cssPath = path.posix.join(stylesPath ?? 'styles', `${name}.css`);
+        const { themeByPosition, variablesExtracted, classesExtracted } = await handlerForeignThemes({ dir, foreignThemes });
 
-      themeRegister[name] = generateThemeRegister({
-        cssPath,
-        rootDocs,
-        stylesDocs,
-        globalDocs,
-        mediaDocs,
-        foreignStyles: classesExtracted,
-        foreignVars: variablesExtracted,
-        foreignBeforeFiles: themeByPosition.before,
-        foreignAfterFiles: themeByPosition.after,
-      });
-      spinner.succeed(
-        `Theme register generated for provider for theme: ${name}`,
-      );
-    }
+        themeRegister[name] = generateThemeRegister({
+          cssPath,
+          rootDocs,
+          stylesDocs,
+          globalDocs,
+          mediaDocs,
+          foreignStyles: classesExtracted,
+          foreignVars: variablesExtracted,
+          foreignBeforeFiles: themeByPosition.before,
+          foreignAfterFiles: themeByPosition.after,
+        });
+      },
+    });
   }
 
   // Generate React/framework provider if configured
-  if (provider) {
-    spinner.start('Provider configuration found, generating tools...');
-    await generateProvider({
-      dir: path.resolve(dir, provider.path),
-      providerDocs: themeRegister,
-      declarationHelp: provider.declarationHelp,
-      providerName: provider.name,
-      compilerType,
-      embedCss: Boolean(provider.embedCss),
-    });
-    spinner.succeed('Provider tools generated successfully.');
-  }
+  spinner.start('Provider configuration found, generating tools...');
+  await runStep({
+    spinner,
+    condition: provider,
+    sccMsg: 'Provider tools generated successfully.',
+    fbMsg: 'No provider found for theme.',
+    cb: async () => {
+      await generateProvider({
+        dir: path.resolve(dir, provider.path),
+        providerDocs: themeRegister,
+        declarationHelp: provider.declarationHelp,
+        providerName: provider.name,
+        compilerType,
+        embedCss: Boolean(provider.embedCss),
+      });
+    },
+  });
 }
 
 module.exports = { bernovaStyles };
