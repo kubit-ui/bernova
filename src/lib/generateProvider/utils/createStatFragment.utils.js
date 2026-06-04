@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 const { writeDoc } = require('../../writeDoc/writeDoc.utils');
 const { interfaceWrapper } = require('./interfaceWrapper.utils');
 const { anonimousWrapper } = require('./anonimousWrapper.utils');

@@ -14,12 +14,7 @@ const path = require('path');
  * @param {Object} fonts - The fonts configuration.
  * @returns {Promise<string>} The processed CSS.
  */
-const processCssWithPostcss = async (
-  css,
-  minified = false,
-  prefix = '',
-  fonts = {},
-) => {
+const processCssWithPostcss = async (css, minified = false, prefix = '', fonts = {}) => {
   const plugins = [
     postcssPresetEnv({
       stage: 0,
@@ -61,7 +56,7 @@ const processCssWithPostcss = async (
     plugins.push(
       cssnano({
         preset: 'default',
-      }),
+      })
     );
   }
 

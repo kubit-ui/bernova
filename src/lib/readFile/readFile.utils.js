@@ -19,7 +19,8 @@ register({
     allowJs: true,
     skipLibCheck: true, // Skip type checking for faster compilation
     allowSyntheticDefaultImports: true,
-    checkJs: false
+    checkJs: false,
+    ignoreDeprecations: '6.0',
   },
 });
 
@@ -31,7 +32,7 @@ register({
  * @returns {Promise<Object>} The parsed configuration data
  * @throws {Error} When file cannot be read or parsed
  */
-const readConfigData = async (filePath) => {
+const readConfigData = async filePath => {
   try {
     const data = await fs.readFile(filePath, 'utf8');
     const parsedData = JSON.parse(data);
@@ -72,7 +73,7 @@ const readConfigData = async (filePath) => {
  * const data = readThemeData(paths);
  * // Returns: { foundations: {...}, theme: {...} }
  */
-const readThemeData = (paths) => {
+const readThemeData = paths => {
   const data = {};
 
   Object.entries(paths).forEach(([key, config]) => {
@@ -80,9 +81,7 @@ const readThemeData = (paths) => {
       const { path: modulePath, name } = config;
 
       if (!modulePath || !name) {
-        throw new Error(
-          `Invalid configuration for ${key}: missing path or name`
-        );
+        throw new Error(`Invalid configuration for ${key}: missing path or name`);
       }
 
       // Resolve the module path
