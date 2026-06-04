@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.12
+
+### Patch Changes
+
+- Merge pull request #41 from kubit-ui/fix/added-unit-tests
+
 ## 1.7.11
 
 ### Patch Changes
