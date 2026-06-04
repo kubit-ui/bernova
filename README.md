@@ -91,7 +91,8 @@ npx bv-config
   "provider": {
     "name": "BernovaStyledProvider",
     "path": "./src/styles/provider",
-    "declarationHelp": true
+    "declarationHelp": true,
+    "embedCss": true
   },
   "themes": [
     {
