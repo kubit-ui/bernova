@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- Merge pull request #43 from kubit-ui/feat/try-minor-version
+
+## 1.7.10
+
+### Patch Changes
+
 - Merge pull request #42 from kubit-ui/fix/fixed-bernova-version
 
 ## 1.7.12
